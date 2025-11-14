@@ -1,0 +1,169 @@
+﻿@model List<Aplicacion.DTOs.ContratoGestionDTO>
+@{
+    ViewData["Title"] = "Gestión de Contratos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>
+        <i class="bi bi-folder-fill"></i> @ViewData["Title"]
+    </h2>
+    <a asp-action="Crear" class="btn btn-primary shadow-sm">
+        <i class="bi bi-plus-circle"></i> Crear Nuevo Contrato
+    </a>
+</div>
+<hr />
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body text-center">
+                <h6 class="card-title text-uppercase">Contratos Vigentes</h6>
+                <p class="card-text fs-2 fw-bold">@ViewBag.ContratosVigentes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="card-title text-uppercase">Por Renovar (&lt;30 días)</h6>
+                <p class="card-text fs-2 fw-bold text-muted">0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row g-3">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var contrato in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">@contrato.EmpleadoNombre</h5>
+                        @if (contrato.EstadoContrato == "A")
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else if (contrato.EstadoContrato == "F")
+                        {
+                            <span class="badge bg-danger">Finalizado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@contrato.EstadoContrato</span>
+                        }
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-1"><small>DNI: @contrato.EmpleadoCodigo</small></p>
+                        <p class="card-text mb-1"><strong>Cargo:</strong> @contrato.Cargo</p>
+                        <p class="card-text mb-1"><strong>Área:</strong> @contrato.Area</p>
+                        <p class="card-text mb-1"><strong>Tipo:</strong> @contrato.TipoContrato</p>
+                        <p class="card-text mb-1"><strong>Sueldo:</strong> S/ @contrato.Sueldo.ToString("N2")</p>
+                        <hr class="my-2">
+                        <p class="card-text mb-1"><strong>Inicio:</strong> @contrato.FechaInicio.ToString("dd/MM/yyyy")</p>
+                        <p class="card-text mb-1"><strong>Fin:</strong> @(contrato.FechaFin?.ToString("dd/MM/yyyy") ?? "Indefinido")</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between bg-light">
+                        <a asp-action="Editar" asp-route-id="@contrato.ContratoCodigo" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+
+                        @if (contrato.EstadoContrato == "A")
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalFinalizar"
+                                    data-contrato-id="@contrato.ContratoCodigo"
+                                    data-empleado-nombre="@contrato.EmpleadoNombre">
+                                <i class="bi bi-calendar-x"></i> Finalizar
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info">No se encontraron contratos registrados.</div>
+        </div>
+    }
+</div>
+
+
+<div class="modal fade" id="modalFinalizar" tabindex="-1" aria-labelledby="modalFinalizarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Finalizar" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalFinalizarLabel">Finalizar Contrato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro que desea finalizar el contrato de <strong id="nombreEmpleadoModal">...</strong>?</p>
+
+                    <input type="hidden" id="contratoCodigoModal" name="contratoCodigo" />
+
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label"><strong>Motivo de Finalización (Obligatorio)</strong></label>
+                        <textarea id="motivo" name="motivo" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Sí, Finalizar Contrato</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // Espera a que el DOM esté listo
+        document.addEventListener("DOMContentLoaded", function() {
+            var modalFinalizar = document.getElementById('modalFinalizar');
+
+            // Escucha el evento 'show.bs.modal' (cuando el modal se está abriendo)
+            modalFinalizar.addEventListener('show.bs.modal', function (event) {
+                // 'event.relatedTarget' es el botón que abrió el modal
+                var button = event.relatedTarget;
+
+                // Extrae los datos 'data-*' que pusimos en el botón
+                var contratoId = button.getAttribute('data-contrato-id');
+                var empleadoNombre = button.getAttribute('data-empleado-nombre');
+
+                // Busca los elementos dentro del modal
+                var modalTitle = modalFinalizar.querySelector('.modal-title');
+                var modalBodyNombre = modalFinalizar.querySelector('#nombreEmpleadoModal');
+                var modalInputId = modalFinalizar.querySelector('#contratoCodigoModal');
+
+                // Actualiza el contenido del modal
+                modalTitle.textContent = 'Finalizar Contrato: ' + empleadoNombre;
+                modalBodyNombre.textContent = empleadoNombre;
+                modalInputId.value = contratoId;
+            });
+        });
+    </script>
+}

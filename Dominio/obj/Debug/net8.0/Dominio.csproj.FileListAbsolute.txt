@@ -1,0 +1,22 @@
+C:\Proyectos\Nominas\Dominio\bin\Debug\net8.0\Dominio.deps.json
+C:\Proyectos\Nominas\Dominio\bin\Debug\net8.0\Dominio.dll
+C:\Proyectos\Nominas\Dominio\bin\Debug\net8.0\Dominio.pdb
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\Dominio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\Dominio.AssemblyInfoInputs.cache
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\Dominio.AssemblyInfo.cs
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\Dominio.csproj.CoreCompileInputs.cache
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\Dominio.dll
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\refint\Dominio.dll
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\Dominio.pdb
+C:\Proyectos\Nominas\Dominio\obj\Debug\net8.0\ref\Dominio.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\bin\Debug\net8.0\Dominio.deps.json
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\bin\Debug\net8.0\Dominio.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\bin\Debug\net8.0\Dominio.pdb
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\Dominio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\Dominio.AssemblyInfoInputs.cache
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\Dominio.AssemblyInfo.cs
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\Dominio.csproj.CoreCompileInputs.cache
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\Dominio.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\refint\Dominio.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\Dominio.pdb
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Dominio\obj\Debug\net8.0\ref\Dominio.dll

@@ -1,0 +1,174 @@
+﻿@model List<Aplicacion.DTOs.NominaDetalleDTO>
+@{
+    ViewData["Title"] = "Reporte de Nómina por Período";
+
+    // Obtenemos los totales que el Controlador calculó (RN-02)
+    var totales = ViewBag.Totales as Presentacion.Nominas.Controllers.NominaController.ReporteTotalesDTO;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="bi bi-file-earmark-spreadsheet"></i> Reporte de Nómina por Período
+            </h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <strong><i class="bi bi-filter"></i> Selección de Período y Filtros</strong>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Nomina" asp-action="ListarNominas" method="get">
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label for="periodoCodigo" class="form-label">Período:</label>
+                        <select class="form-select"
+                                name="periodoCodigo"
+                                id="periodoCodigo"
+                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Periodos">
+                            <option value="">-- Todos los Períodos --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="areaCodigo" class="form-label">Área:</label>
+                        <select class="form-select"
+                                name="areaCodigo"
+                                id="areaCodigo"
+                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Areas">
+                            <option value="">-- Todas las Áreas --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="tipoContrato" class="form-label">Tipo Contrato:</label>
+                        <select class="form-select"
+                                name="tipoContrato"
+                                id="tipoContrato"
+                                asp-items="(IEnumerable<SelectListItem>)ViewBag.TiposContrato">
+                            <option value="">-- Todos los Tipos --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Generar Reporte
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-outline-success"
+                                formaction="@Url.Action("ExportarExcel")">
+                            <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+                        </button>
+                        <button type="submit" class="btn btn-outline-danger"
+                                formaction="@Url.Action("ExportarPDF")">
+                            <i class="bi bi-file-earmark-pdf"></i> Exportar a PDF
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model != null && Model.Any())
+            {
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Nómina Generada</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped table-sm" id="tablaNominas">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>DNI</th>
+                                        <th>Empleado</th>
+                                        <th>Cargo</th>
+                                        <th>S. Básico</th>
+                                        <th>Asig. Familiar</th>
+                                        <th>H. Extras (monto)</th>
+                                        <th>ONP</th>
+                                        <th>AFP</th>
+                                        <th>ESSALUD (9%)</th>
+                                        <th>Imp. 5ta</th>
+                                        <th class="text-end">Total Neto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var nomina in Model)
+                                    {
+                                        <tr>
+                                            <td><small>@nomina.DNI</small></td>
+                                            <td>@nomina.EmpleadoNombre</td>
+                                            <td>@nomina.Cargo</td>
+                                            <td class="text-end">@nomina.SueldoBaseStr</td>
+                                            <td class="text-end">@nomina.AsignacionFamiliarStr</td>
+                                            <td class="text-end">@nomina.HorasExtrasStr</td>
+                                            <td class="text-end text-danger">@nomina.DescuentoONPStr</td>
+                                            <td class="text-end text-danger">@nomina.DescuentoAFPStr</td>
+                                            <td class="text-end text-info">@nomina.AporteESSALUDStr</td>
+                                            <td class="text-end text-danger">@nomina.Renta5taStr</td>
+                                            <td class="text-end"><strong>S/ @nomina.SueldoNetoStr</strong></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No se encontraron nóminas para los filtros seleccionados.
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any() && totales != null)
+    {
+        <div class="row mt-4">
+            <div class="col-md-8 offset-md-4">
+                <h5 class="text-end">Totales Acumulados del Reporte</h5>
+                <ul class="list-group shadow-sm">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Salario Bruto: 
+                        <span class="badge bg-primary rounded-pill fs-6">S/ @totales.TotalSalarioBruto.ToString("N2")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Descuentos (ONP, AFP, 5ta): 
+                        <span class="badge bg-danger rounded-pill fs-6">S/ @totales.TotalDescuentos.ToString("N2")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Total Neto Pagado:</strong> 
+                        <strong class="text-success fs-5">S/ @totales.TotalNetoPagar.ToString("N2")</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-muted">
+                        Total Aporte ESSALUD (9%):
+                        <span class="badge bg-info rounded-pill fs-6">S/ @totales.TotalESSALUD.ToString("N2")</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+
+</div>

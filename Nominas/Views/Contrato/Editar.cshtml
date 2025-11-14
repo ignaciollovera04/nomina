@@ -1,0 +1,106 @@
+﻿@model Dominio.Resultados.ContratoCalculoInfo
+@{
+    ViewData["Title"] = "Editar Contrato";
+}
+
+<div class="row">
+    <div class="col-md-10 col-lg-8">
+        <h2>
+            <i class="bi bi-pencil-square"></i> @ViewData["Title"]
+        </h2>
+        <p class="text-muted">Modificando el contrato @Model.ContratoCodigo.</p>
+        <hr />
+
+        <form asp-action="Editar" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="ContratoCodigo" />
+            <input type="hidden" asp-for="ContratoEmpleadoCodigo" />
+
+            <div class="card shadow-sm mb-4">
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <strong><i class="bi bi-file-earmark-text-fill"></i> Datos del Contrato</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="ContratoTipoContrato" class="form-label">Tipo de Contrato</label>
+                            <select asp-for="ContratoTipoContrato" class="form-select" required>
+                                <option value="INDEFINIDO">Indefinido</option>
+                                <option value="PLAZO_FIJO">Plazo Fijo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoFechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" asp-for="ContratoFechaInicio" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoFechaFin" class="form-label">Fecha de Fin (si es Plazo Fijo)</label>
+                            <input type="date" asp-for="ContratoFechaFin" class="form-control" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ContratoSueldo" class="form-label">Sueldo Básico (S/)</label>
+                            <input type="number" asp-for="ContratoSueldo" class="form-control" min="1025" step="0.01" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoCargoCodigo" class="form-label">Cargo</label>
+                            <select asp-for="ContratoCargoCodigo" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Cargos" required>
+                                <option value="">-- Seleccionar Cargo --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoAreaCodigo" class="form-label">Área</label>
+                            <select asp-for="ContratoAreaCodigo" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Areas" required>
+                                <option value="">-- Seleccionar Área --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoRegimenPensionario" class="form-label">Régimen Pensionario</label>
+                            <select asp-for="ContratoRegimenPensionario" class="form-select" required>
+                                <option value="ONP">ONP</option>
+                                <option value="AFP INTEGRA">AFP INTEGRA</option>
+                                <option value="AFP PROFUTURO">AFP PROFUTURO</option>
+                                <option value="AFP HABITAT">AFP HABITAT</option>
+                                <option value="AFP PRIMA">AFP PRIMA</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoTipoSeguro" class="form-label">Cobertura de Salud</label>
+                            <select asp-for="ContratoTipoSeguro" class="form-select" required>
+                                <option value="ESSALUD">ESSALUD</option>
+                                <option value="EPS">EPS</option>
+                                <option value="SIS">SIS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoEntidadEPS" class="form-label">Entidad EPS (Si aplica)</label>
+                            <input type="text" asp-for="ContratoEntidadEPS" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="ContratoAsignacionFamiliar" class="form-label">Aplica Asignación Familiar</label>
+                            <select asp-for="ContratoAsignacionFamiliar" class="form-select" required>
+                                <option value="N">No</option>
+                                <option value="S">Sí</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-save"></i> Guardar Cambios
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>

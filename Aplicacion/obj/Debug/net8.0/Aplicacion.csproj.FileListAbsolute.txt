@@ -1,0 +1,34 @@
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Aplicacion.deps.json
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Aplicacion.dll
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Aplicacion.pdb
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Dominio.dll
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Persistencia.dll
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Dominio.pdb
+C:\Proyectos\Nominas\Aplicacion\bin\Debug\net8.0\Persistencia.pdb
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.AssemblyReference.cache
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.AssemblyInfoInputs.cache
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.AssemblyInfo.cs
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.CoreCompileInputs.cache
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.Up2Date
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.dll
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\refint\Aplicacion.dll
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.pdb
+C:\Proyectos\Nominas\Aplicacion\obj\Debug\net8.0\ref\Aplicacion.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Aplicacion.deps.json
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Aplicacion.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Aplicacion.pdb
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Dominio.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Persistencia.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Dominio.pdb
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\bin\Debug\net8.0\Persistencia.pdb
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.AssemblyReference.cache
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.AssemblyInfoInputs.cache
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.AssemblyInfo.cs
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.CoreCompileInputs.cache
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.Up2Date
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\refint\Aplicacion.dll
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.pdb
+C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\ref\Aplicacion.dll

@@ -1,0 +1,257 @@
+﻿@model Dominio.Entidades.Contrato
+@{
+    ViewData["Title"] = "Crear Nuevo Contrato";
+
+    // RN-02: Definimos la fecha de hoy para bloquear fechas pasadas
+    string fechaDeHoy = DateTime.Now.ToString("yyyy-MM-dd");
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong><i class="bi bi-search"></i> 1. Buscar Empleado</strong>
+            </div>
+            <div class="card-body">
+                <form id="formBuscarEmpleado" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="inputBusqueda" class="form-label">Buscar por DNI o Nombre</label>
+                        <input type="text" class="form-control" id="inputBusqueda" placeholder="Ingrese DNI o nombre...">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" id="btnBuscarEmpleado" class="btn btn-info w-100">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong><i class="bi bi-list-ul"></i> 2. Lista de Empleados</strong>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>DNI</th>
+                                <th>Nombre</th>
+                                <th>Cargo Actual</th>
+                                <th>Área Actual</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultadosEmpleados">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">A la espera de una búsqueda...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Crear" method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="ContratoEmpleadoCodigo" id="ContratoEmpleadoCodigo" />
+
+    <div class="card shadow-sm" id="panelDatosContrato" style="display: none;">
+        <div class="card-header bg-primary text-white">
+            <strong><i class="bi bi-file-earmark-text-fill"></i> 3. Datos del Contrato</strong>
+        </div>
+        <div class="card-body">
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>Empleado Seleccionado:</h5>
+                    <p class="mb-0"><strong>Nombre:</strong> <span id="displayNombre" class="text-primary"></span></p>
+                    <p class="mb-0"><strong>DNI:</strong> <span id="displayDNI"></span></p>
+                    <p class="mb-0"><strong>Cargo Sugerido:</strong> <span id="displayCargo"></span></p>
+                    <p class="mb-0"><strong>Área Sugerida:</strong> <span id="displayArea"></span></p>
+                </div>
+            </div>
+            <hr />
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="ContratoTipoContrato" class="form-label">Tipo de Contrato</label>
+                    <select asp-for="ContratoTipoContrato" class="form-select" required>
+                        <option value="INDEFINIDO">Indefinido</option>
+                        <option value="PLAZO_FIJO">Plazo Fijo</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoFechaInicio" class="form-label">Fecha de Inicio</label>
+                    <input type="date" asp-for="ContratoFechaInicio"
+                           min="@fechaDeHoy"
+                           value="@fechaDeHoy"
+                           class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoFechaFin" class="form-label">Fecha de Fin (si es Plazo Fijo)</label>
+                    <input type="date" asp-for="ContratoFechaFin" min="@fechaDeHoy" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ContratoSueldo" class="form-label">Sueldo Básico (S/)</label>
+                    <input type="number" asp-for="ContratoSueldo" class="form-control" min="1025" step="0.01" placeholder="Ej: 1025.00" required />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoCargoCodigo" class="form-label">Cargo</label>
+                    <select asp-for="ContratoCargoCodigo" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Cargos" required>
+                        <option value="">-- Seleccionar Cargo --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoAreaCodigo" class="form-label">Área</label>
+                    <select asp-for="ContratoAreaCodigo" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Areas" required>
+                        <option value="">-- Seleccionar Área --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ContratoRegimenPensionario" class="form-label">Régimen Pensionario</label>
+                    <select asp-for="ContratoRegimenPensionario" class="form-select" required>
+                        <option value="ONP">ONP (Por defecto)</option>
+                        <option value="AFP INTEGRA">AFP INTEGRA</option>
+                        <option value="AFP PROFUTURO">AFP PROFUTURO</option>
+                        <option value="AFP HABITAT">AFP HABITAT</option>
+                        <option value="AFP PRIMA">AFP PRIMA</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoTipoSeguro" class="form-label">Cobertura de Salud</label>
+                    <select asp-for="ContratoTipoSeguro" class="form-select" required>
+                        <option value="ESSALUD">ESSALUD</option>
+                        <option value="EPS">EPS</option>
+                        <option value="SIS">SIS</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoEntidadEPS" class="form-label">Entidad EPS (Si aplica)</label>
+                    <input type="text" asp-for="ContratoEntidadEPS" class="form-control" placeholder="Ej: Rímac" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ContratoAsignacionFamiliar" class="form-label">Aplica Asignación Familiar</label>
+                    <select asp-for="ContratoAsignacionFamiliar" class="form-select" required>
+                        <option value="N">No</option>
+                        <option value="S">Sí (Aplica 10% RMV)</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+            <div class="text-end">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-save"></i> Guardar Contrato
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const formBuscar = document.getElementById('formBuscarEmpleado');
+            const inputBusqueda = document.getElementById('inputBusqueda');
+            const tablaResultados = document.getElementById('tablaResultadosEmpleados');
+            const panelDatosContrato = document.getElementById('panelDatosContrato');
+
+            // --- 1. Lógica de Búsqueda de Empleado (AJAX) ---
+            formBuscar.addEventListener('submit', function(e) {
+                e.preventDefault(); // Evita que el formulario se envíe
+                const query = inputBusqueda.value;
+
+                if (query.length < 2) {
+                    tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Debe ingresar al menos 2 caracteres.</td></tr>';
+                    return;
+                }
+
+                // Llama al ContratoController
+                fetch(`@Url.Action("BuscarEmpleados", "Contrato")?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Limpia la tabla
+                        tablaResultados.innerHTML = '';
+
+                        if (data.length === 0) {
+                            tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No se encontraron empleados.</td></tr>';
+                            return;
+                        }
+
+                        // Llena la tabla con los resultados
+                        data.forEach(empleado => {
+                            tablaResultados.innerHTML += `
+                                <tr>
+                                    <td>${empleado.codigo}</td>
+                                    <td>${empleado.nombre}</td>
+                                    <td>${empleado.cargo || 'N/A'}</td>
+                                    <td>${empleado.area || 'N/A'}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm btnSeleccionarEmpleado"
+                                                data-codigo="${empleado.codigo}"
+                                                data-nombre="${empleado.nombre}"
+                                                data-cargo="${empleado.cargo || ''}"
+                                                data-area="${empleado.area || ''}">
+                                            <i class="bi bi-check-circle"></i> Seleccionar
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error en la búsqueda:', error);
+                        tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos.</td></tr>';
+                    });
+            });
+
+            // --- 2. Lógica al Seleccionar Empleado ---
+            // Usamos delegación de eventos para los botones que se crean dinámicamente
+            tablaResultados.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btnSeleccionarEmpleado')) {
+                    const boton = e.target;
+
+                    // Obtiene los datos del botón
+                    const codigo = boton.dataset.codigo;
+                    const nombre = boton.dataset.nombre;
+                    const cargo = boton.dataset.cargo;
+                    const area = boton.dataset.area;
+
+                    // Rellena el formulario principal (Parte 3)
+                    document.getElementById('ContratoEmpleadoCodigo').value = codigo;
+                    document.getElementById('displayNombre').textContent = nombre;
+                    document.getElementById('displayDNI').textContent = codigo;
+                    document.getElementById('displayCargo').textContent = cargo;
+                    document.getElementById('displayArea').textContent = area;
+
+                    // Muestra el formulario de contrato
+                    panelDatosContrato.style.display = 'block';
+
+                    // Mueve la vista al formulario
+                    panelDatosContrato.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+        });
+    </script>
+}
