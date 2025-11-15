@@ -1,4 +1,5 @@
 ﻿using Aplicacion.DTOs;
+using Dominio.Resultados; 
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,12 @@ namespace Aplicacion
 {
     public interface INominaService
     {
-
         Task<List<PeriodoNominaDTO>> ObtenerTodosLosPeriodos();
         Task<List<PeriodoNominaDTO>> ObtenerPeriodosDisponibles();
         Task<ResultadoProcesarNominaDTO> ProcesarNominaPorPeriodo(string periodoCodigo);
-        Task<List<NominaDetalleDTO>> ObtenerNominasProcesadas(
+
+     
+        Task<ReporteNominaCompletoDTO> ObtenerNominasProcesadas(
             string periodoCodigo = null,
             string areaCodigo = null,
             string tipoContrato = null);

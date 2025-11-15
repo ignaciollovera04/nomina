@@ -17,7 +17,31 @@
             <input type="hidden" asp-for="ContratoCodigo" />
             <input type="hidden" asp-for="ContratoEmpleadoCodigo" />
 
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+            @if (ViewBag.Exito != null)
+            {
+                <div class="alert alert-success">@ViewBag.Exito</div>
+            }
+
             <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <strong><i class="bi bi-person"></i> Datos del Empleado (No modificable)</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">DNI / Cód. Empleado</label>
+                            <input type="text" asp-for="ContratoEmpleadoCodigo" class="form-control" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Empleado</label>
+                            <input type="text" asp-for="EmpleadoNombre" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="card shadow-sm">
@@ -44,7 +68,7 @@
 
                         <div class="col-md-4">
                             <label asp-for="ContratoSueldo" class="form-label">Sueldo Básico (S/)</label>
-                            <input type="number" asp-for="ContratoSueldo" class="form-control" min="1025" step="0.01" required />
+                            <input type="number" asp-for="ContratoSueldo" class="form-control" min="1130" step="0.01" required />
                         </div>
                         <div class="col-md-4">
                             <label asp-for="ContratoCargoCodigo" class="form-label">Cargo</label>
@@ -58,6 +82,7 @@
                                 <option value="">-- Seleccionar Área --</option>
                             </select>
                         </div>
+
                         <div class="col-md-4">
                             <label asp-for="ContratoRegimenPensionario" class="form-label">Régimen Pensionario</label>
                             <select asp-for="ContratoRegimenPensionario" class="form-select" required>
@@ -80,6 +105,7 @@
                             <label asp-for="ContratoEntidadEPS" class="form-label">Entidad EPS (Si aplica)</label>
                             <input type="text" asp-for="ContratoEntidadEPS" class="form-control" />
                         </div>
+
                         <div class="col-md-4">
                             <label asp-for="ContratoAsignacionFamiliar" class="form-label">Aplica Asignación Familiar</label>
                             <select asp-for="ContratoAsignacionFamiliar" class="form-select" required>
@@ -87,7 +113,6 @@
                                 <option value="S">Sí</option>
                             </select>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -104,3 +129,78 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const tipoContratoSelect = document.getElementById('ContratoTipoContrato');
+            const fechaInicioInput = document.getElementById('ContratoFechaInicio');
+            const fechaFinInput = document.getElementById('ContratoFechaFin');
+
+            // ----------------------------------------------------
+            // 1. Lógica de Validación de Fechas (Mínimo 30 Días)
+            // ----------------------------------------------------
+            function actualizarMinimoFechaFin() {
+                // Si el campo está deshabilitado por ser INDEFINIDO, no hacemos nada
+                if (fechaFinInput.hasAttribute('disabled')) {
+                    return;
+                }
+
+                const inicioValue = fechaInicioInput.value;
+
+                if (inicioValue) {
+                    const fechaInicio = new Date(inicioValue);
+
+                    // Calculamos la fecha mínima (Inicio + 30 días)
+                    const fechaMinFin = new Date(fechaInicio);
+                    fechaMinFin.setDate(fechaInicio.getDate() + 30);
+
+                    // Formateamos como YYYY-MM-DD
+                    const year = fechaMinFin.getFullYear();
+                    const month = String(fechaMinFin.getMonth() + 1).padStart(2, '0');
+                    const day = String(fechaMinFin.getDate()).padStart(2, '0');
+                    const formattedMinDate = `${year}-${month}-${day}`;
+
+                    // Aplicar la restricción 'min'
+                    fechaFinInput.setAttribute('min', formattedMinDate);
+
+                    // Si la fecha actual en el campo de fin es menor al nuevo mínimo, la corregimos
+                    if (fechaFinInput.value && fechaFinInput.value < formattedMinDate) {
+                         fechaFinInput.value = formattedMinDate;
+                    }
+                } else {
+                    fechaFinInput.removeAttribute('min');
+                }
+            }
+
+            // ----------------------------------------------------
+            // 2. Lógica de Habilitación/Deshabilitación (Plazo Fijo)
+            // ----------------------------------------------------
+            function manejarFechaFinHabilitacion() {
+                const esPlazoFijo = tipoContratoSelect.value === 'PLAZO_FIJO';
+
+                if (esPlazoFijo) {
+                    // Habilita el campo y aplica el mínimo de 30 días
+                    fechaFinInput.removeAttribute('disabled');
+                    actualizarMinimoFechaFin();
+                } else { // INDEFINIDO
+                    // Deshabilita el campo y limpia el valor y la restricción
+                    fechaFinInput.setAttribute('disabled', 'disabled');
+                    fechaFinInput.value = '';
+                    fechaFinInput.removeAttribute('min');
+                }
+            }
+
+
+            // ----------------------------------------------------
+            // 3. Event Listeners y Ejecución Inicial
+            // ----------------------------------------------------
+            tipoContratoSelect.addEventListener('change', manejarFechaFinHabilitacion);
+            fechaInicioInput.addEventListener('change', actualizarMinimoFechaFin);
+
+            // Ejecutar la lógica de habilitación al cargar (usamos setTimeout para asegurar la carga de valores iniciales de Razor)
+            setTimeout(manejarFechaFinHabilitacion, 10);
+        });
+    </script>
+}

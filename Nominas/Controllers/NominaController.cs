@@ -1,22 +1,23 @@
 ﻿using Aplicacion;
 using Aplicacion.DTOs;
 using Aplicacion.Servicios;
-using Dominio.Entidades; 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Persistencia.Interfaces; 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json; 
-using System.Threading.Tasks;
 
 using ClosedXML.Excel;
-using System.IO;
-using System.Data;
+using Dominio.Entidades;
+using Dominio.Resultados; 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Persistencia.Interfaces;
+using Presentacion.Nominas.Reportes; 
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using Presentacion.Nominas.Reportes; 
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 
 namespace Presentacion.Nominas.Controllers
@@ -24,31 +25,26 @@ namespace Presentacion.Nominas.Controllers
     public class NominaController : Controller
     {
         private readonly INominaService _nominaService;
-        private readonly IAreaRepository _areaRepo; 
+        private readonly IAreaRepository _areaRepo;
 
-       
         public NominaController(INominaService nominaService, IAreaRepository areaRepo)
         {
             _nominaService = nominaService;
-            _areaRepo = areaRepo; 
+            _areaRepo = areaRepo;
         }
 
-        // ==================================================================
-        //       Acción 1: Dashboard (Tu 'Index')
-        // ==================================================================
+        // --- Acción 1: Dashboard (Página de Inicio) ---
         public IActionResult Index()
         {
             return View();
         }
 
-        // ==================================================================
-        //       Acción 2: Página de Procesar Nómina [GET]
-        // ==================================================================
+        // --- Acción 2: Página de Procesar Nómina [GET] ---
         public async Task<IActionResult> ProcesarNomina()
         {
             var periodos = await _nominaService.ObtenerPeriodosDisponibles();
 
-            // Pasar TempData a ViewBag para que la vista los muestre
+            // Pasa los resultados del POST (si los hay) a la vista
             ViewBag.Success = TempData["Success"];
             ViewBag.Error = TempData["Error"];
 
@@ -64,11 +60,9 @@ namespace Presentacion.Nominas.Controllers
             return View(periodos);
         }
 
-        // ==================================================================
-        //       Acción 3: Lógica de Procesamiento [POST]
-        // ==================================================================
+        // --- Acción 3: Lógica de Procesamiento [POST] ---
         [HttpPost]
-        [ValidateAntiForgeryToken] // Buena práctica de seguridad
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Procesar(string periodoCodigo)
         {
             if (string.IsNullOrEmpty(periodoCodigo))
@@ -79,6 +73,7 @@ namespace Presentacion.Nominas.Controllers
 
             var resultado = await _nominaService.ProcesarNominaPorPeriodo(periodoCodigo);
 
+            // Pasa los resultados de vuelta a la vista 'ProcesarNomina'
             if (resultado.Exito)
             {
                 TempData["Success"] = resultado.Mensaje;
@@ -95,123 +90,117 @@ namespace Presentacion.Nominas.Controllers
             return RedirectToAction(nameof(ProcesarNomina));
         }
 
-        // ==================================================================
-        //       Acción 4: Reporte de Nóminas (Listar Nóminas) [GET]
-        // ==================================================================
+        // --- Acción 4: Reporte de Nóminas (Listar Nóminas) [GET] ---
         [HttpGet]
         public async Task<IActionResult> ListarNominas(string periodoCodigo = null, string areaCodigo = null, string tipoContrato = null)
         {
-            // 1. Obtener los datos (ya filtrados por el servicio) (RN-01, RN-06)
-            var nominasDTO = await _nominaService.ObtenerNominasProcesadas(
-                periodoCodigo,
-                areaCodigo,
-                tipoContrato);
+            // 1. Inicializa la lista de nóminas como VACÍA
+            List<NominaDetalleDTO> nominasDTO = new List<NominaDetalleDTO>();
 
-            // 2. Calcular Totales (RN-02)
-            var totales = new ReporteTotalesDTO
+            // 2. Prepara un mensaje de bienvenida/instrucción
+            ViewBag.MensajeInstruccion = "Por favor, seleccione un período y haga clic en 'Generar Reporte'.";
+
+            // 3. ¡LÓGICA CLAVE! Solo busca en la BD si se ha enviado un filtro de período
+            if (!string.IsNullOrEmpty(periodoCodigo))
             {
-                TotalSueldoBase = nominasDTO.Sum(n => decimal.TryParse(n.SueldoBaseStr, out var val) ? val : 0),
-                TotalAsignacionFamiliar = nominasDTO.Sum(n => decimal.TryParse(n.AsignacionFamiliarStr, out var val) ? val : 0),
-                TotalSalarioBruto = nominasDTO.Sum(n => decimal.TryParse(n.SueldoBrutoStr, out var val) ? val : 0),
-                TotalDescuentos = nominasDTO.Sum(n => decimal.TryParse(n.TotalDescuentosStr, out var val) ? val : 0),
-                TotalNetoPagar = nominasDTO.Sum(n => decimal.TryParse(n.SueldoNetoStr, out var val) ? val : 0),
-                TotalESSALUD = nominasDTO.Sum(n => decimal.TryParse(n.AporteESSALUDStr, out var val) ? val : 0)
-            };
-            ViewBag.Totales = totales; // Enviar totales a la vista
-            ViewBag.Error = TempData["Error"]; 
+                // 4. Obtener el DTO "wrapper" (que contiene la lista Y los totales)
+                var reporteCompleto = await _nominaService.ObtenerNominasProcesadas(
+                    periodoCodigo,
+                    areaCodigo,
+                    tipoContrato);
 
-            // 3. Cargar los Dropdowns para los filtros (RN-06)
+                // 5. Desempaquetar los resultados
+                nominasDTO = reporteCompleto.Nominas; // Asigna la lista de nóminas
+                ViewBag.Totales = reporteCompleto.Totales; // Pasa los totales
+
+                // 6. Oculta el mensaje de instrucción
+                ViewBag.MensajeInstruccion = null;
+
+                // 7. (Opcional) Mostrar mensaje si el filtro no arrojó resultados
+                if (!nominasDTO.Any())
+                {
+                    ViewBag.MensajeInstruccion = "No se encontraron nóminas para los filtros seleccionados.";
+                }
+            }
+            else
+            {
+                // Si no hay filtro, crea un objeto de totales vacío para que la vista no falle
+                ViewBag.Totales = new Dominio.Resultados.ReporteTotales();
+            }
+
+            ViewBag.Error = TempData["Error"];
+
+            // 8. Cargar los Dropdowns para los filtros
             await CargarFiltrosReporte(periodoCodigo, areaCodigo, tipoContrato);
 
-            // 4. Pasar el modelo a la Vista
+            // 9. Pasar el modelo (lista vacía o lista filtrada) a la Vista
             return View(nominasDTO);
         }
 
-        // ==================================================================
-        //         Acciones de Exportación (RN-03)
-        // ==================================================================
-
-        // ==================================================================
-        //         Acción de Exportación a Excel (RN-03) - COMPLETA
-        // ==================================================================
+        // --- Acción 5: Exportación a Excel [GET] (RN-03) ---
         [HttpGet]
         public async Task<IActionResult> ExportarExcel(string periodoCodigo = null, string areaCodigo = null, string tipoContrato = null)
         {
-            // 1. Obtener los datos (exactamente igual que en ListarNominas)
-            var nominas = await _nominaService.ObtenerNominasProcesadas(
+            var reporteCompleto = await _nominaService.ObtenerNominasProcesadas(
                 periodoCodigo,
                 areaCodigo,
                 tipoContrato);
 
-            // 2. Crear el libro de Excel en memoria
+            var nominas = reporteCompleto.Nominas;
+
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Nóminas");
                 var currentRow = 1;
 
-                // 3. Crear la Fila de Encabezado (RN-01)
-                // (Coincide con el prototipo [cite: 34-43])
-                worksheet.Cell(currentRow, 1).Value = "DNI";
-                worksheet.Cell(currentRow, 2).Value = "Empleado";
-                worksheet.Cell(currentRow, 3).Value = "Cargo";
-                worksheet.Cell(currentRow, 4).Value = "Área";
-                worksheet.Cell(currentRow, 5).Value = "Sueldo Básico";
-                worksheet.Cell(currentRow, 6).Value = "Asig. Familiar";
-                worksheet.Cell(currentRow, 7).Value = "H. Extras (monto)";
-                worksheet.Cell(currentRow, 8).Value = "ONP";
-                worksheet.Cell(currentRow, 9).Value = "AFP";
-                worksheet.Cell(currentRow, 10).Value = "Imp. 5ta";
-                worksheet.Cell(currentRow, 11).Value = "Total Descuentos";
-                worksheet.Cell(currentRow, 12).Value = "Sueldo Neto";
-                worksheet.Cell(currentRow, 13).Value = "ESSALUD (9%)";
-                worksheet.Cell(currentRow, 14).Value = "Período";
-
-                // Poner el encabezado en negrita
+                // 3. Crear la Fila de Encabezado (Coincide con la vista)
+                worksheet.Cell(currentRow, 1).Value = "Cód. Nómina";
+                worksheet.Cell(currentRow, 2).Value = "Cód. Contrato"; // <<== AÑADIDO
+                worksheet.Cell(currentRow, 3).Value = "DNI";
+                worksheet.Cell(currentRow, 4).Value = "Empleado";
+                worksheet.Cell(currentRow, 5).Value = "Cargo";
+                worksheet.Cell(currentRow, 6).Value = "S. Básico";
+                worksheet.Cell(currentRow, 7).Value = "Asig. Familiar";
+                worksheet.Cell(currentRow, 8).Value = "H. Extras (monto)";
+                worksheet.Cell(currentRow, 9).Value = "ONP";
+                worksheet.Cell(currentRow, 10).Value = "AFP";
+                worksheet.Cell(currentRow, 11).Value = "ESSALUD (9%)";
+                worksheet.Cell(currentRow, 12).Value = "Imp. 5ta";
+                worksheet.Cell(currentRow, 13).Value = "Total Neto";
                 worksheet.Row(currentRow).Style.Font.Bold = true;
 
                 // 4. Llenar las filas con los datos del DTO
                 foreach (var nomina in nominas)
                 {
                     currentRow++;
-                    worksheet.Cell(currentRow, 1).Value = nomina.DNI;
-                    worksheet.Cell(currentRow, 2).Value = nomina.EmpleadoNombre;
-                    worksheet.Cell(currentRow, 3).Value = nomina.Cargo;
-                    worksheet.Cell(currentRow, 4).Value = nomina.Area;
-
-                    // Convertimos los strings de vuelta a decimal para que Excel los trate como números
-                    worksheet.Cell(currentRow, 5).Value = decimal.TryParse(nomina.SueldoBaseStr, out var sb) ? sb : 0;
-                    worksheet.Cell(currentRow, 6).Value = decimal.TryParse(nomina.AsignacionFamiliarStr, out var af) ? af : 0;
-                    worksheet.Cell(currentRow, 7).Value = decimal.TryParse(nomina.HorasExtrasStr, out var he) ? he : 0;
-                    worksheet.Cell(currentRow, 8).Value = decimal.TryParse(nomina.DescuentoONPStr, out var onp) ? onp : 0;
-                    worksheet.Cell(currentRow, 9).Value = decimal.TryParse(nomina.DescuentoAFPStr, out var afp) ? afp : 0;
-                    worksheet.Cell(currentRow, 10).Value = decimal.TryParse(nomina.Renta5taStr, out var r5) ? r5 : 0;
-                    worksheet.Cell(currentRow, 11).Value = decimal.TryParse(nomina.TotalDescuentosStr, out var td) ? td : 0;
-                    worksheet.Cell(currentRow, 12).Value = decimal.TryParse(nomina.SueldoNetoStr, out var sn) ? sn : 0;
-                    worksheet.Cell(currentRow, 13).Value = decimal.TryParse(nomina.AporteESSALUDStr, out var es) ? es : 0;
-
-                    worksheet.Cell(currentRow, 14).Value = nomina.Periodo;
+                    worksheet.Cell(currentRow, 1).Value = nomina.NominaCodigo;
+                    worksheet.Cell(currentRow, 2).Value = nomina.ContratoCodigo; // <<== AÑADIDO
+                    worksheet.Cell(currentRow, 3).Value = nomina.DNI;
+                    worksheet.Cell(currentRow, 4).Value = nomina.EmpleadoNombre;
+                    worksheet.Cell(currentRow, 5).Value = nomina.Cargo;
+                    worksheet.Cell(currentRow, 6).Value = decimal.TryParse(nomina.SueldoBaseStr, out var v) ? v : 0;
+                    worksheet.Cell(currentRow, 7).Value = decimal.TryParse(nomina.AsignacionFamiliarStr, out v) ? v : 0;
+                    worksheet.Cell(currentRow, 8).Value = decimal.TryParse(nomina.HorasExtrasStr, out v) ? v : 0;
+                    worksheet.Cell(currentRow, 9).Value = decimal.TryParse(nomina.DescuentoONPStr, out v) ? v : 0;
+                    worksheet.Cell(currentRow, 10).Value = decimal.TryParse(nomina.DescuentoAFPStr, out v) ? v : 0;
+                    worksheet.Cell(currentRow, 11).Value = decimal.TryParse(nomina.AporteESSALUDStr, out v) ? v : 0;
+                    worksheet.Cell(currentRow, 12).Value = decimal.TryParse(nomina.Renta5taStr, out v) ? v : 0;
+                    worksheet.Cell(currentRow, 13).Value = decimal.TryParse(nomina.SueldoNetoStr, out v) ? v : 0;
                 }
 
-                // 5. Añadir Fila de Totales (RN-02)
+                // (Los totales ahora están después de la tabla)
                 currentRow++;
                 worksheet.Row(currentRow).Style.Font.Bold = true;
-                worksheet.Cell(currentRow, 10).Value = "TOTALES:";
+                worksheet.Cell(currentRow, 12).Value = "TOTAL NETO:";
+                worksheet.Cell(currentRow, 13).FormulaA1 = $"=SUM(M2:M{currentRow - 1})";
 
-                // Usamos fórmulas de Excel para sumar las columnas
-                worksheet.Cell(currentRow, 11).FormulaA1 = $"=SUM(K2:K{currentRow - 1})"; // Total Descuentos
-                worksheet.Cell(currentRow, 12).FormulaA1 = $"=SUM(L2:L{currentRow - 1})"; // Total Neto
-                worksheet.Cell(currentRow, 13).FormulaA1 = $"=SUM(M2:M{currentRow - 1})"; // Total ESSALUD
-
-                // Ajustar columnas al contenido
                 worksheet.Columns().AdjustToContents();
 
-                // 6. Guardar el archivo en un stream de memoria
+                // 6. Guardar y devolver
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-
-                    // 7. Devolver el archivo al navegador
                     return File(
                         content,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -220,56 +209,48 @@ namespace Presentacion.Nominas.Controllers
             }
         }
 
-        // ==================================================================
-        //         Acción de Exportación a PDF (RN-03) - con QuestPDF
-        // ==================================================================
+        // --- Acción 6: Exportación a PDF [GET] (RN-03) ---
         [HttpGet]
         public async Task<IActionResult> ExportarPDF(string periodoCodigo = null, string areaCodigo = null, string tipoContrato = null)
         {
-            // 1. Obtener los datos (igual que en ListarNominas)
-            var nominasDTO = await _nominaService.ObtenerNominasProcesadas(
+            // 1. Obtener el DTO "wrapper"
+            var reporteCompleto = await _nominaService.ObtenerNominasProcesadas(
                 periodoCodigo,
                 areaCodigo,
                 tipoContrato);
 
-            // 2. Calcular Totales (RN-02)
-            var totales = new ReporteTotalesDTO
-            {
-                TotalSalarioBruto = nominasDTO.Sum(n => decimal.TryParse(n.SueldoBrutoStr, out var val) ? val : 0),
-                TotalDescuentos = nominasDTO.Sum(n => decimal.TryParse(n.TotalDescuentosStr, out var val) ? val : 0),
-                TotalNetoPagar = nominasDTO.Sum(n => decimal.TryParse(n.SueldoNetoStr, out var val) ? val : 0),
-                TotalESSALUD = nominasDTO.Sum(n => decimal.TryParse(n.AporteESSALUDStr, out var val) ? val : 0)
-            };
+            // 2. Desempaquetar
+            var nominasDTO = reporteCompleto.Nominas;
+            var totales = reporteCompleto.Totales; // <-- Totales ya calculados por el Dominio
 
             // 3. Obtener Usuario (RN-04)
             string usuario = User.Identity.IsAuthenticated ? User.Identity.Name : "Sistema";
 
-            // 4. Crear la instancia del documento
+            // 4. Crear instancia del documento QuestPDF
             var documento = new ReporteNominaDocument(nominasDTO, totales, usuario);
 
-            // 5. Generar el PDF en memoria
+            // 5. Generar PDF
             byte[] pdfBytes = documento.GeneratePdf();
 
-            // 6. Devolver el archivo
+            // 6. Devolver archivo
             return File(pdfBytes, "application/pdf", $"ReporteNomina_{DateTime.Now:yyyyMMdd}.pdf");
         }
 
-        // ==================================================================
-        //         Método Helper para cargar filtros
-        // ==================================================================
+        // --- Helper: Cargar Filtros (Dropdowns) ---
         private async Task CargarFiltrosReporte(string periodoSel, string areaSel, string tipoContratoSel)
         {
-         
+            // 1. Cargar Períodos (RN-06)
             var periodos = await _nominaService.ObtenerTodosLosPeriodos();
             ViewBag.Periodos = periodos.Select(p => new SelectListItem
             {
+                // Esta línea añade el texto (ej. "(Activo)", "(Cerrado)")
                 Text = $"{p.PeriodoInicioStr} - {p.PeriodoFinStr} ({p.EstadoDescripcion})",
                 Value = p.PeriodoCodigo,
                 Selected = (p.PeriodoCodigo == periodoSel)
-            }).ToList();
+            }).ToList(); 
 
             // 2. Cargar Áreas (RN-06)
-            var areas = await _areaRepo.ListarActivas(); 
+            var areas = await _areaRepo.ListarActivas();
             ViewBag.Areas = areas.Select(a => new SelectListItem
             {
                 Text = a.AreaDescripcion,
@@ -286,17 +267,6 @@ namespace Presentacion.Nominas.Controllers
             ViewBag.TiposContrato = tiposContrato;
         }
 
-        // ==================================================================
-        //         DTO Helper para los Totales (RN-02)
-        // ==================================================================
-        public class ReporteTotalesDTO
-        {
-            public decimal TotalSueldoBase { get; set; }
-            public decimal TotalAsignacionFamiliar { get; set; }
-            public decimal TotalSalarioBruto { get; set; }
-            public decimal TotalDescuentos { get; set; }
-            public decimal TotalNetoPagar { get; set; }
-            public decimal TotalESSALUD { get; set; }
-        }
+        
     }
 }

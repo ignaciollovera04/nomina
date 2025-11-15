@@ -73,9 +73,24 @@ namespace Aplicacion.Servicios
             }).ToList();
         }
 
-        /// <summary>
-        /// Carga los datos necesarios para los dropdowns del formulario 
-                    /// </summary>
+
+        public async Task<List<EmpleadoBusquedaDTO>> BuscarEmpleadosParaContrato()
+        {
+            var entidades = await _empleadoRepo.BuscarEmpleadosParaContrato();
+
+            // Mapear de la Entidad (Dominio) al DTO (Aplicacion)
+            return entidades.Select(e => new EmpleadoBusquedaDTO
+            {
+                Codigo = e.Codigo,
+                Nombre = e.Nombre,
+                Cargo = e.Cargo,
+                Area = e.Area,
+                Estado = e.Estado
+            }).ToList();
+        }
+
+
+
         public async Task<ContratoFormDTO> ObtenerDatosParaFormularioContrato()
         {
             var areas = await _areaRepo.ListarActivas();

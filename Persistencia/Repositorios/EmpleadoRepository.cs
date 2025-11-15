@@ -34,5 +34,14 @@ namespace Persistencia.Repositorios
                 parameters,
                 commandType: CommandType.StoredProcedure);
         }
+
+        public async Task<List<EmpleadoBusqueda>> BuscarEmpleadosParaContrato()
+        {
+            var empleados = await _connection.QueryAsync<EmpleadoBusqueda>(
+                "dbo.sp_BuscarEmpleadosParaContrato",
+                commandType: CommandType.StoredProcedure);
+            return empleados.ToList();
+        }
+
     }
 }

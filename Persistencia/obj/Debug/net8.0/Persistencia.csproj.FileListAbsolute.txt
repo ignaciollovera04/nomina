@@ -28,3 +28,19 @@ C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Persistencia\obj\Debug\
 C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Persistencia\obj\Debug\net8.0\refint\Persistencia.dll
 C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Persistencia\obj\Debug\net8.0\Persistencia.pdb
 C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Persistencia\obj\Debug\net8.0\ref\Persistencia.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\bin\Debug\net8.0\Persistencia.deps.json
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\bin\Debug\net8.0\Persistencia.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\bin\Debug\net8.0\Persistencia.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\bin\Debug\net8.0\Dominio.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\bin\Debug\net8.0\Dominio.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.csproj.AssemblyReference.cache
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.AssemblyInfoInputs.cache
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.AssemblyInfo.cs
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.csproj.CoreCompileInputs.cache
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.sourcelink.json
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persiste.7F7D6998.Up2Date
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\refint\Persistencia.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Persistencia\obj\Debug\net8.0\ref\Persistencia.dll

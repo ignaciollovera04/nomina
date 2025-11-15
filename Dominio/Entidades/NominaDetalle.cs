@@ -9,6 +9,7 @@ namespace Dominio.Entidades
     public class NominaDetalle
     {
         public string NominaCodigo { get; set; }
+        public string ContratoCodigo { get; set; }
         public string DNI { get; set; }
         public string EmpleadoNombre { get; set; }
         public string Cargo { get; set; }

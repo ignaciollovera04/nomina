@@ -7,18 +7,20 @@ using QuestPDF.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dominio.Resultados; // <<== 1. AÑADE ESTE USING
 
-using static Presentacion.Nominas.Controllers.NominaController;
+// <<== 2. ELIMINA EL 'using static Presentacion.Nominas.Controllers.NominaController'
 
 namespace Presentacion.Nominas.Reportes
 {
     public class ReporteNominaDocument : IDocument
     {
         private readonly List<NominaDetalleDTO> _nominas;
-        private readonly ReporteTotalesDTO _totales;
+        private readonly ReporteTotales _totales; // <<== 3. TIPO CORREGIDO
         private readonly string _usuario;
 
-        public ReporteNominaDocument(List<NominaDetalleDTO> nominas, ReporteTotalesDTO totales, string usuario)
+        // <<== 3. TIPO CORREGIDO EN EL CONSTRUCTOR
+        public ReporteNominaDocument(List<NominaDetalleDTO> nominas, ReporteTotales totales, string usuario)
         {
             _nominas = nominas;
             _totales = totales;
@@ -26,6 +28,9 @@ namespace Presentacion.Nominas.Reportes
         }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+
+        // (El resto de tu clase 'Compose', 'ComposeTable', 'ComposeFooter', etc.
+        // ya usa la variable '_totales' correctamente, así que no necesita cambios.)
 
         public void Compose(IDocumentContainer container)
         {
@@ -36,17 +41,13 @@ namespace Presentacion.Nominas.Reportes
                     page.Margin(1, Unit.Centimetre);
                     page.DefaultTextStyle(style => style.FontSize(9).FontFamily(Fonts.Arial));
 
-                 
                     page.Header().AlignCenter().Text(text =>
                     {
                         text.Span("Reporte de Nómina por Período")
                             .SemiBold().FontSize(16).FontColor(Colors.Grey.Darken4);
                     });
 
-                  
                     page.Content().Element(ComposeTable);
-
-                    // 3. Pie de Página (RN-04) [cite: 14]
                     page.Footer().Element(ComposeFooter);
                 });
         }
@@ -57,49 +58,48 @@ namespace Presentacion.Nominas.Reportes
             {
                 column.Item().Table(table =>
                 {
-                    // Columnas (RN-01) 
+                    // Columnas (ACTUALIZADO)
                     table.ColumnsDefinition(columns =>
                     {
+                        columns.ConstantColumn(45); // Cód. Nómina
+                        columns.ConstantColumn(45); // Cód. Contrato (NUEVO)
                         columns.ConstantColumn(60); // DNI
                         columns.RelativeColumn(3);  // Empleado
                         columns.RelativeColumn(2);  // Cargo
                         columns.ConstantColumn(50); // S. Básico
-                        columns.ConstantColumn(50); // Asig. Fam
-                        columns.ConstantColumn(40); // H.E.
                         columns.ConstantColumn(40); // ONP
                         columns.ConstantColumn(40); // AFP
                         columns.ConstantColumn(40); // 5ta
                         columns.ConstantColumn(60); // Neto
                     });
 
-                    // Encabezado de la Tabla
+                    // Encabezado de la Tabla (ACTUALIZADO)
                     table.Header(header =>
                     {
+                        header.Cell().Element(CellEstiloHeader).Text("Cód. Nómina");
+                        header.Cell().Element(CellEstiloHeader).Text("Cód. Contrato"); // NUEVO
                         header.Cell().Element(CellEstiloHeader).Text("DNI");
                         header.Cell().Element(CellEstiloHeader).Text("Empleado");
                         header.Cell().Element(CellEstiloHeader).Text("Cargo");
                         header.Cell().Element(CellEstiloHeader).AlignRight().Text("S. Básico");
-                        header.Cell().Element(CellEstiloHeader).AlignRight().Text("Asig. Fam.");
-                        header.Cell().Element(CellEstiloHeader).AlignRight().Text("H.E.");
                         header.Cell().Element(CellEstiloHeader).AlignRight().Text("ONP");
                         header.Cell().Element(CellEstiloHeader).AlignRight().Text("AFP");
                         header.Cell().Element(CellEstiloHeader).AlignRight().Text("Imp. 5ta");
                         header.Cell().Element(CellEstiloHeader).AlignRight().Text("Total Neto");
                     });
 
-                    // Filas de Datos
+                    // Filas de Datos (ACTUALIZADO)
                     foreach (var nomina in _nominas)
                     {
+                        table.Cell().Element(CellEstiloContenido).Text(nomina.NominaCodigo);
+                        table.Cell().Element(CellEstiloContenido).Text(nomina.ContratoCodigo); // NUEVO
                         table.Cell().Element(CellEstiloContenido).Text(nomina.DNI);
                         table.Cell().Element(CellEstiloContenido).Text(nomina.EmpleadoNombre);
                         table.Cell().Element(CellEstiloContenido).Text(nomina.Cargo);
                         table.Cell().Element(CellEstiloContenido).AlignRight().Text(nomina.SueldoBaseStr);
-                        table.Cell().Element(CellEstiloContenido).AlignRight().Text(nomina.AsignacionFamiliarStr);
-                        table.Cell().Element(CellEstiloContenido).AlignRight().Text(nomina.HorasExtrasStr);
                         table.Cell().Element(CellEstiloContenido).AlignRight().Text(nomina.DescuentoONPStr);
                         table.Cell().Element(CellEstiloContenido).AlignRight().Text(nomina.DescuentoAFPStr);
                         table.Cell().Element(CellEstiloContenido).AlignRight().Text(nomina.Renta5taStr);
-
                         table.Cell().Element(CellEstiloContenido).AlignRight().Text(text =>
                         {
                             text.Span($"S/ {nomina.SueldoNetoStr}").SemiBold();
@@ -109,7 +109,7 @@ namespace Presentacion.Nominas.Reportes
 
                 column.Item().PaddingVertical(10);
 
-                // Tabla de Totales (RN-02) 
+                // Esta parte ya usa '_totales', que ahora es del tipo correcto
                 column.Item().AlignRight().Table(table =>
                 {
                     table.ColumnsDefinition(columns =>
@@ -124,7 +124,6 @@ namespace Presentacion.Nominas.Reportes
                     table.Cell().Element(CellEstiloTotales).Text("Total Descuentos:");
                     table.Cell().Element(CellEstiloTotales).AlignRight().Text($"S/ {_totales.TotalDescuentos:N2}");
 
-                   
                     table.Cell().Element(CellEstiloTotales).Text(text => text.Span("Total Neto Pagado:").SemiBold());
                     table.Cell().Element(CellEstiloTotales).AlignRight().Text(text => text.Span($"S/ {_totales.TotalNetoPagar:N2}").SemiBold());
 
@@ -136,7 +135,6 @@ namespace Presentacion.Nominas.Reportes
 
         void ComposeFooter(IContainer container)
         {
-            
             container.Row(row =>
             {
                 row.RelativeItem().Text(text =>
@@ -155,7 +153,8 @@ namespace Presentacion.Nominas.Reportes
             });
         }
 
-        
+        // --- Métodos Helper para estilos de celda ---
+
         static IContainer CellEstiloHeader(IContainer container)
         {
             return container.DefaultTextStyle(x => x.SemiBold())
@@ -165,7 +164,6 @@ namespace Presentacion.Nominas.Reportes
 
         static IContainer CellEstiloContenido(IContainer container)
         {
-         
             return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten3)
                 .PaddingVertical(2).PaddingHorizontal(4);
         }

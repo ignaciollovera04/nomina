@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Persistencia\\Persistencia.csproj": {}
+    "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Persistencia\\Persistencia.csproj": {}
   },
   "projects": {
-    "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Dominio\\Dominio.csproj": {
+    "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Dominio\\Dominio.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Dominio\\Dominio.csproj",
+        "projectUniqueName": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Dominio\\Dominio.csproj",
         "projectName": "Dominio",
-        "projectPath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Dominio\\Dominio.csproj",
+        "projectPath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Dominio\\Dominio.csproj",
         "packagesPath": "C:\\Users\\ialla\\.nuget\\packages\\",
-        "outputPath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Dominio\\obj\\",
+        "outputPath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Dominio\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -69,14 +69,14 @@
         }
       }
     },
-    "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Persistencia\\Persistencia.csproj": {
+    "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Persistencia\\Persistencia.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Persistencia\\Persistencia.csproj",
+        "projectUniqueName": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Persistencia\\Persistencia.csproj",
         "projectName": "Persistencia",
-        "projectPath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Persistencia\\Persistencia.csproj",
+        "projectPath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Persistencia\\Persistencia.csproj",
         "packagesPath": "C:\\Users\\ialla\\.nuget\\packages\\",
-        "outputPath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Persistencia\\obj\\",
+        "outputPath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Persistencia\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -97,8 +97,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Dominio\\Dominio.csproj": {
-                "projectPath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Dominio\\Dominio.csproj"
+              "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Dominio\\Dominio.csproj": {
+                "projectPath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Dominio\\Dominio.csproj"
               }
             }
           }

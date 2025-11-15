@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hQ1OriJ5Bm0=",
+  "dgSpecHash": "vyY5CfcYeZc=",
   "success": true,
-  "projectFilePath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Aplicacion\\Aplicacion.csproj",
+  "projectFilePath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Aplicacion\\Aplicacion.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ialla\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\ialla\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",

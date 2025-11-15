@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0XxsyKz5g3I=",
+  "dgSpecHash": "m/PJD5Vwezg=",
   "success": true,
-  "projectFilePath": "C:\\Proyectos\\G1 - Sprint 3 - Calidad de software\\Nominas\\Test\\Tests.csproj",
+  "projectFilePath": "C:\\Users\\ialla\\OneDrive\\Desktop\\Proyecto Sprint 4\\nominaV2\\Test\\Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ialla\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
     "C:\\Users\\ialla\\.nuget\\packages\\microsoft.codecoverage\\17.8.0\\microsoft.codecoverage.17.8.0.nupkg.sha512",

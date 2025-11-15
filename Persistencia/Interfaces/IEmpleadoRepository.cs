@@ -11,5 +11,7 @@ namespace Persistencia.Interfaces
     {
         Task<List<EmpleadoBusqueda>> BuscarEmpleados(string query);
         Task<Empleado> ObtenerEmpleadoPorCodigo(string codigo);
+
+        Task<List<EmpleadoBusqueda>> BuscarEmpleadosParaContrato();
     }
 }

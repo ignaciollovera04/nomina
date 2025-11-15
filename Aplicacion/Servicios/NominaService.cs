@@ -28,19 +28,51 @@ namespace Aplicacion.Servicios
 
         public async Task<List<PeriodoNominaDTO>> ObtenerPeriodosDisponibles()
         {
-            var periodos = await _periodoRepo.ListarTodos();
-            return periodos
-                .Where(p => p.PeriodoEstado == "A") // Solo activos
-                .Select(p => new PeriodoNominaDTO
+            // 1. Obtener TODOS los períodos de la base de datos
+            var todosLosPeriodos = await _periodoRepo.ListarTodos();
+
+            // 2. Ordenarlos por fecha de inicio para asegurar la secuencia
+            var periodosOrdenados = todosLosPeriodos.OrderBy(p => p.PeriodoInicio).ToList();
+
+            // 3. Encontrar el ÚLTIMO período que ya fue 'Cerrado' ('C')
+            var ultimoPeriodoCerrado = periodosOrdenados.LastOrDefault(p => p.PeriodoEstado == "C");
+
+            PeriodoNomina proximoPeriodoParaProcesar = null;
+
+            if (ultimoPeriodoCerrado == null)
+            {
+                // CASO 1: Es el inicio. No hay ningún período cerrado.
+                // Buscamos el PRIMER período 'Activo' ('A') de toda la lista.
+                proximoPeriodoParaProcesar = periodosOrdenados.FirstOrDefault(p => p.PeriodoEstado == "A");
+            }
+            else
+            {
+                // CASO 2: Ya hay períodos cerrados.
+                // Buscamos el primer período 'Activo' ('A') que venga DESPUÉS del último cerrado.
+                proximoPeriodoParaProcesar = periodosOrdenados.FirstOrDefault(p =>
+                    p.PeriodoInicio > ultimoPeriodoCerrado.PeriodoInicio &&
+                    p.PeriodoEstado == "A");
+            }
+
+            // 4. Crear la lista de DTOs (que ahora tendrá 0 o 1 elemento)
+            var listaDto = new List<PeriodoNominaDTO>();
+
+            if (proximoPeriodoParaProcesar != null)
+            {
+                // Si encontramos el período que sigue, lo añadimos a la lista
+                listaDto.Add(new PeriodoNominaDTO
                 {
-                    PeriodoCodigo = p.PeriodoCodigo,
-                    PeriodoTipo = p.PeriodoTipo,
-                    PeriodoInicioStr = p.PeriodoInicio.ToString("dd/MM/yyyy"),
-                    PeriodoFinStr = p.PeriodoFin.ToString("dd/MM/yyyy"),
-                    PeriodoEstado = p.PeriodoEstado,
-                    EstadoDescripcion = ObtenerDescripcionEstado(p.PeriodoEstado)
-                })
-                .ToList();
+                    PeriodoCodigo = proximoPeriodoParaProcesar.PeriodoCodigo,
+                    PeriodoTipo = proximoPeriodoParaProcesar.PeriodoTipo,
+                    PeriodoInicioStr = proximoPeriodoParaProcesar.PeriodoInicio.ToString("dd/MM/yyyy"),
+                    PeriodoFinStr = proximoPeriodoParaProcesar.PeriodoFin.ToString("dd/MM/yyyy"),
+                    PeriodoEstado = proximoPeriodoParaProcesar.PeriodoEstado,
+                    EstadoDescripcion = ObtenerDescripcionEstado(proximoPeriodoParaProcesar.PeriodoEstado)
+                });
+            }
+
+            // 5. Devolver la lista (que solo tiene el próximo período válido)
+            return listaDto;
         }
 
         public async Task<List<PeriodoNominaDTO>> ObtenerTodosLosPeriodos()
@@ -49,7 +81,8 @@ namespace Aplicacion.Servicios
 
             return periodos
           
-                .OrderByDescending(p => p.PeriodoInicio) 
+                .OrderByDescending(p => p.PeriodoInicio)
+                .Where(p => p.PeriodoEstado == "C")
                 .Select(p => new PeriodoNominaDTO
                 {
                     PeriodoCodigo = p.PeriodoCodigo,
@@ -176,53 +209,67 @@ namespace Aplicacion.Servicios
         // ==================================================================
         //        MÉTODO 'ObtenerNominasProcesadas' CORREGIDO
         // ==================================================================
-        public async Task<List<NominaDetalleDTO>> ObtenerNominasProcesadas(
-     string periodoCodigo = null,
-     string areaCodigo = null,
-     string tipoContrato = null)
+        public async Task<ReporteNominaCompletoDTO> ObtenerNominasProcesadas(
+      string periodoCodigo = null,
+      string areaCodigo = null,
+      string tipoContrato = null)
         {
-            // 1. Llama al repo (que llama al SP v3)
+            // 1. Obtener las ENTIDADES de la base de datos (con todos los detalles)
             // 'nominasDeDB' es una List<Dominio.Entidades.NominaDetalle>
             var nominasDeDB = await _nominaRepo.ListarNominasProcesadas(
                 periodoCodigo,
                 areaCodigo,
                 tipoContrato);
 
-        
-            return nominasDeDB.Select(n => new NominaDetalleDTO
+            // 2. APLICAR REGLA DE DOMINIO (RN-02: Calcular Totales)
+            // ¡Aquí es donde llamamos a la lógica testeable!
+            var totales = ReporteNominaRules.CalcularTotales(nominasDeDB);
+
+            // 3. Mapear las Entidades a DTOs (para la vista)
+            // Tu DTO 'NominaDetalleDTO' está perfecto para esto
+            var nominasDTO = nominasDeDB.Select(n => new NominaDetalleDTO
             {
+                // Identificación
                 NominaCodigo = n.NominaCodigo,
+                ContratoCodigo = n.ContratoCodigo,
                 EmpleadoNombre = n.EmpleadoNombre,
-                DNI = n.DNI, 
+                DNI = n.DNI,
                 Area = n.Area,
                 Cargo = n.Cargo,
-                Periodo = $"{n.PeriodoInicio} - {n.PeriodoFin}", 
+                Periodo = $"{n.PeriodoInicio} - {n.PeriodoFin}",
 
-                // Ingresos
+                // Ingresos (RN-01)
                 SueldoBaseStr = n.SueldoBase.ToString("N2"),
                 AsignacionFamiliarStr = n.AsignacionFamiliar.ToString("N2"),
-                HorasExtrasStr = n.NominaHorasExtras.ToString(), 
-                GratificacionStr = n.Bonificaciones.ToString("N2"),
+                HorasExtrasStr = n.NominaHorasExtras.ToString(),
+                GratificacionStr = n.Bonificaciones.ToString("N2"), // (Grati+CTS)
                 CTSStr = "0.00",
-                SueldoBrutoStr = n.SalarioBruto.ToString("N2"), 
+                SueldoBrutoStr = n.SalarioBruto.ToString("N2"),
 
-                // Descuentos
+                // Descuentos (RN-06, RN-08, RN-10)
                 DescuentoONPStr = n.DescuentoONP.ToString("N2"),
                 DescuentoAFPStr = n.DescuentoAFP.ToString("N2"),
-                Renta5taStr = n.ImpuestoQuintaCategoria.ToString("N2"), 
-                TotalDescuentosStr = n.Deducciones.ToString("N2"), 
+                Renta5taStr = n.ImpuestoQuintaCategoria.ToString("N2"),
+                TotalDescuentosStr = n.Deducciones.ToString("N2"),
 
-                
-                AporteESSALUDStr = n.ESSALUD.ToString("N2"), 
+                // Aporte empleador (RN-07)
+                AporteESSALUDStr = n.ESSALUD.ToString("N2"),
 
-                
+                // Neto (RN-17)
                 SueldoNetoStr = n.SueldoNeto.ToString("N2"),
 
-              
-                FechaProcesamiento = n.FechaProcesamiento, 
+                // Auditoría
+                FechaProcesamiento = n.FechaProcesamiento,
+                EstadoDescripcion = n.EstadoNomina 
             }).ToList();
-        }
 
+            // 4. Devolver el DTO wrapper
+            return new ReporteNominaCompletoDTO
+            {
+                Nominas = nominasDTO,
+                Totales = totales
+            };
+        }
         private string ObtenerDescripcionEstado(string estado)
         {
             return estado switch

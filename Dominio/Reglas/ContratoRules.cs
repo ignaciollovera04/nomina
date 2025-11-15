@@ -30,7 +30,7 @@ namespace Dominio.Reglas
             }
 
             // RN-11: Salario no puede ser inferior a RMV 
-            // CA-06: Mensaje de error [cite: 286]
+            // CA-06: Mensaje de error 
             if (contrato.ContratoSueldo < RMV_VIGENTE)
             {
                 return ValidacionRuleResult.Falla($"El sueldo base (S/ {contrato.ContratoSueldo}) no puede ser inferior a la RMV vigente (S/ {RMV_VIGENTE}).");
@@ -43,6 +43,35 @@ namespace Dominio.Reglas
                 return ValidacionRuleResult.Falla("La fecha de inicio no puede ser anterior a la fecha actual.");
             }
 
+            //RN - PLAZO FIJO MÍNIMO DE 30 DÍAS, fecha fin no puede ser anterior a fecha de inicio
+
+            if (contrato.ContratoTipoContrato == "PLAZO_FIJO")
+            {
+                // 1. Verificar si la fecha de fin es nula (debe ser obligatoria para Plazo Fijo)
+                if (contrato.ContratoFechaFin == null)
+                {
+                    return ValidacionRuleResult.Falla("Un contrato a Plazo Fijo debe tener una fecha de fin.");
+                }
+
+                DateTime fechaFin = contrato.ContratoFechaFin.Value.Date;
+                DateTime fechaInicio = contrato.ContratoFechaInicio.Date;
+
+                // 2. Verificar que la fecha de fin no sea anterior a la de inicio
+                if (fechaFin <= fechaInicio)
+                {
+                    return ValidacionRuleResult.Falla("La fecha de fin debe ser posterior a la fecha de inicio.");
+                }
+
+                // 3. Verificar tiempo mínimo de plazo (30 días)
+                // Se verifica si la diferencia entre las fechas es menor o igual a 30 días
+                if ((fechaFin - fechaInicio).TotalDays < 30)
+                {
+                    return ValidacionRuleResult.Falla("El plazo mínimo de un contrato debe ser de 30 días posteriores a la fecha de inicio.");
+                }
+            }
+
+
+
             // RN-06: Empleado expulsado no puede ser contratado
             // CA-10: Mensaje de error 
             if (empleado.EmpleadosEstado == "E") // 'E' = Expulsado
@@ -54,6 +83,11 @@ namespace Dominio.Reglas
         }
 
       
+
+
+
+
+
         public static ValidacionRuleResult ValidarFinalizacion(string motivo)
         {
            

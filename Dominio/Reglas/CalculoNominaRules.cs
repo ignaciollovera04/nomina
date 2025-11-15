@@ -13,7 +13,7 @@ namespace Dominio.Reglas
         private const decimal TASA_ONP = 0.13m;
         private const decimal TASA_AFP_APORTE = 0.10m;
         private const decimal TASA_ESSALUD = 0.09m;
-        private const decimal ASIGNACION_FAMILIAR_MONTO = 102.50m; // 2025
+        private const decimal ASIGNACION_FAMILIAR_MONTO = 113.00m; // 2025
         private const decimal GRATIFICACION_ADICIONAL = 0.09m;
 
         public class ResultadoCalculoNomina

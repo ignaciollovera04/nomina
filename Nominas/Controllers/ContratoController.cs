@@ -170,6 +170,16 @@ namespace Presentacion.Nominas.Controllers
         }
 
 
+
+        [HttpGet]
+        public async Task<IActionResult> BuscarEmpleadosParaContrato()
+        {
+            var empleados = await _contratoService.BuscarEmpleadosParaContrato();
+            return Json(empleados); // Devuelve la lista como JSON
+        }
+
+
+
         // ==================================================================
         //         Método Helper para cargar filtros (Dropdowns)
         // ==================================================================

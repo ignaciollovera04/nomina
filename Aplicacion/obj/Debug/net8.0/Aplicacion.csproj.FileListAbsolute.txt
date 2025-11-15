@@ -32,3 +32,21 @@ C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\ne
 C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\refint\Aplicacion.dll
 C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\Aplicacion.pdb
 C:\Proyectos\G1 - Sprint 3 - Calidad de software\Nominas\Aplicacion\obj\Debug\net8.0\ref\Aplicacion.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Aplicacion.deps.json
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Aplicacion.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Aplicacion.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Dominio.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Persistencia.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Dominio.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\bin\Debug\net8.0\Persistencia.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.AssemblyReference.cache
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.AssemblyInfoInputs.cache
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.AssemblyInfo.cs
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.CoreCompileInputs.cache
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.sourcelink.json
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.csproj.Up2Date
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\refint\Aplicacion.dll
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\Aplicacion.pdb
+C:\Users\ialla\OneDrive\Desktop\Proyecto Sprint 4\nominaV2\Aplicacion\obj\Debug\net8.0\ref\Aplicacion.dll

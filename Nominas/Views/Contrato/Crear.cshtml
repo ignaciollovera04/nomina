@@ -13,17 +13,25 @@
                 <strong><i class="bi bi-search"></i> 1. Buscar Empleado</strong>
             </div>
             <div class="card-body">
+
                 <form id="formBuscarEmpleado" class="row g-3 align-items-end">
                     <div class="col-md-5">
-                        <label for="inputBusqueda" class="form-label">Buscar por DNI o Nombre</label>
-                        <input type="text" class="form-control" id="inputBusqueda" placeholder="Ingrese DNI o nombre...">
+                        <label for="inputBusqueda" class="form-label">Buscar por Código o Nombre</label>
+                        <input type="text" class="form-control" id="inputBusqueda" placeholder="Ingrese Código o Nombre...">
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" id="btnBuscarEmpleado" class="btn btn-info w-100">
+                        <button type="submit" id="btnBuscarEmpleado" class="btn btn-secondary w-100" disabled>
                             <i class="bi bi-search"></i> Buscar
                         </button>
                     </div>
+
+                    <div class="col-md-5">
+                        <button type="button" id="btnBuscarSinContrato" class="btn btn-outline-info w-100">
+                            <i class="bi bi-person-x"></i> Mostrar Empleados Inactivos / Expulsados
+                        </button>
+                    </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -40,7 +48,7 @@
                     <table class="table table-hover table-sm">
                         <thead class="table-light sticky-top">
                             <tr>
-                                <th>DNI</th>
+                                <th>Código</th>
                                 <th>Nombre</th>
                                 <th>Cargo Actual</th>
                                 <th>Área Actual</th>
@@ -49,7 +57,7 @@
                         </thead>
                         <tbody id="tablaResultadosEmpleados">
                             <tr>
-                                <td colspan="5" class="text-center text-muted">A la espera de una búsqueda...</td>
+                                <td colspan="5" class="text-center text-muted">Comience a escribir para buscar...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -61,9 +69,7 @@
 
 <form asp-action="Crear" method="post" class="mt-4">
     @Html.AntiForgeryToken()
-
     <input type="hidden" asp-for="ContratoEmpleadoCodigo" id="ContratoEmpleadoCodigo" />
-
     <div class="card shadow-sm" id="panelDatosContrato" style="display: none;">
         <div class="card-header bg-primary text-white">
             <strong><i class="bi bi-file-earmark-text-fill"></i> 3. Datos del Contrato</strong>
@@ -103,12 +109,12 @@
                 </div>
                 <div class="col-md-4">
                     <label asp-for="ContratoFechaFin" class="form-label">Fecha de Fin (si es Plazo Fijo)</label>
-                    <input type="date" asp-for="ContratoFechaFin" min="@fechaDeHoy" class="form-control" />
+                    <input type="date" asp-for="ContratoFechaFin" class="form-control" />
                 </div>
 
                 <div class="col-md-4">
                     <label asp-for="ContratoSueldo" class="form-label">Sueldo Básico (S/)</label>
-                    <input type="number" asp-for="ContratoSueldo" class="form-control" min="1025" step="0.01" placeholder="Ej: 1025.00" required />
+                    <input type="number" asp-for="ContratoSueldo" class="form-control" min="1130" step="0.01" placeholder="Ej: 1130.00" required />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="ContratoCargoCodigo" class="form-label">Cargo</label>
@@ -167,91 +173,176 @@
 </form>
 
 
+<div class="row mt-4">
+    <div class="col-12">
+        <a asp-controller="Nomina" asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left-circle"></i> Volver al Dashboard Principal
+        </a>
+    </div>
+</div>
+
+
 @section Scripts {
     <script>
+        // Función universal para retrasar la ejecución (Debouncing)
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        };
+
         document.addEventListener("DOMContentLoaded", function() {
 
-            const formBuscar = document.getElementById('formBuscarEmpleado');
             const inputBusqueda = document.getElementById('inputBusqueda');
             const tablaResultados = document.getElementById('tablaResultadosEmpleados');
             const panelDatosContrato = document.getElementById('panelDatosContrato');
+            const btnBuscarSinContrato = document.getElementById('btnBuscarSinContrato');
 
-            // --- 1. Lógica de Búsqueda de Empleado (AJAX) ---
-            formBuscar.addEventListener('submit', function(e) {
-                e.preventDefault(); // Evita que el formulario se envíe
-                const query = inputBusqueda.value;
+            const tipoContratoSelect = document.getElementById('ContratoTipoContrato');
+            const fechaInicioInput = document.getElementById('ContratoFechaInicio');
+            const fechaFinInput = document.getElementById('ContratoFechaFin');
 
-                if (query.length < 2) {
-                    tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Debe ingresar al menos 2 caracteres.</td></tr>';
+
+            // --- FUNCIÓN GENÉRICA PARA LLENAR LA TABLA ---
+            function llenarTablaResultados(data) {
+                tablaResultados.innerHTML = ''; // Limpia la tabla
+
+                if (data.length === 0) {
+                    tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No se encontraron empleados.</td></tr>';
                     return;
                 }
 
-                // Llama al ContratoController
+                data.forEach(empleado => {
+                    let botonHtml = '';
+                    let filaClass = '';
+                    let estadoBadge = '';
+
+                    // RN-06: Si está expulsado ('E'), deshabilitamos el botón
+                    if (empleado.estado === 'E') {
+                        filaClass = 'table-danger'; // Fila roja
+                        estadoBadge = '<span class="badge bg-danger">Expulsado</span>';
+                        botonHtml = `<button type="button" class="btn btn-secondary btn-sm" disabled title="Empleado expulsado, no se puede recontratar (RN-06)">
+                                        <i class="bi bi-slash-circle"></i> No Contratable
+                                     </button>`;
+                    } else { // 'I' (Inactivo) o 'A' (Activo de la búsqueda normal)
+                        if (empleado.estado === 'I') {
+                             estadoBadge = '<span class="badge bg-warning text-dark">Inactivo</span>';
+                        }
+
+                        botonHtml = `<button type="button" class="btn btn-primary btn-sm btnSeleccionarEmpleado"
+                                        data-codigo="${empleado.codigo}"
+                                        data-nombre="${empleado.nombre}"
+                                        data-cargo="${empleado.cargo || ''}"
+                                        data-area="${empleado.area || ''}">
+                                    <i class="bi bi-check-circle"></i> Seleccionar
+                                 </button>`;
+                    }
+
+                    tablaResultados.innerHTML += `
+                        <tr class="${filaClass}">
+                            <td>${empleado.codigo} ${estadoBadge}</td>
+                            <td>${empleado.nombre}</td>
+                            <td>${empleado.cargo || 'N/A'}</td>
+                            <td>${empleado.area || 'N/A'}</td>
+                            <td>${botonHtml}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+
+            // --- Lógica de Búsqueda de Empleado (AJAX - LIVE SEARCH) ---
+            function ejecutarBusqueda() {
+                const query = inputBusqueda.value;
+                if (query.length < 2) {
+                    tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Comience a escribir para buscar...</td></tr>';
+                    panelDatosContrato.style.display = 'none';
+                    return;
+                }
+
                 fetch(`@Url.Action("BuscarEmpleados", "Contrato")?query=${query}`)
                     .then(response => response.json())
                     .then(data => {
-                        // Limpia la tabla
-                        tablaResultados.innerHTML = '';
-
-                        if (data.length === 0) {
-                            tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No se encontraron empleados.</td></tr>';
-                            return;
-                        }
-
-                        // Llena la tabla con los resultados
-                        data.forEach(empleado => {
-                            tablaResultados.innerHTML += `
-                                <tr>
-                                    <td>${empleado.codigo}</td>
-                                    <td>${empleado.nombre}</td>
-                                    <td>${empleado.cargo || 'N/A'}</td>
-                                    <td>${empleado.area || 'N/A'}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-sm btnSeleccionarEmpleado"
-                                                data-codigo="${empleado.codigo}"
-                                                data-nombre="${empleado.nombre}"
-                                                data-cargo="${empleado.cargo || ''}"
-                                                data-area="${empleado.area || ''}">
-                                            <i class="bi bi-check-circle"></i> Seleccionar
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
+                        llenarTablaResultados(data);
                     })
                     .catch(error => {
                         console.error('Error en la búsqueda:', error);
                         tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos.</td></tr>';
                     });
+            }
+
+            inputBusqueda.addEventListener('input', debounce(ejecutarBusqueda, 300));
+
+            // --- Lógica del NUEVO Botón (Mostrar Inactivos/Expulsados) ---
+            btnBuscarSinContrato.addEventListener('click', function() {
+                tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Cargando...</td></tr>';
+
+                fetch(`@Url.Action("BuscarEmpleadosParaContrato", "Contrato")`)
+                    .then(response => response.json())
+                    .then(data => {
+                        llenarTablaResultados(data);
+                    })
+                    .catch(error => {
+                        console.error('Error en la búsqueda de inactivos:', error);
+                        tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos.</td></tr>';
+                    });
             });
 
-            // --- 2. Lógica al Seleccionar Empleado ---
-            // Usamos delegación de eventos para los botones que se crean dinámicamente
+            // --- Lógica de Validación de Fechas (30 Días) ---
+            function actualizarMinimoFechaFin() {
+                const inicioValue = fechaInicioInput.value;
+                const esPlazoFijo = tipoContratoSelect.value === 'PLAZO_FIJO';
+
+                if (esPlazoFijo && inicioValue) {
+                    const fechaInicio = new Date(inicioValue);
+                    const fechaMinFin = new Date(fechaInicio);
+                    fechaMinFin.setDate(fechaInicio.getDate() + 30);
+
+                    const year = fechaMinFin.getFullYear();
+                    const month = String(fechaMinFin.getMonth() + 1).padStart(2, '0');
+                    const day = String(fechaMinFin.getDate()).padStart(2, '0');
+                    const formattedMinDate = `${year}-${month}-${day}`;
+
+                    fechaFinInput.setAttribute('min', formattedMinDate);
+                    fechaFinInput.removeAttribute('disabled');
+
+                    if (!fechaFinInput.value || fechaFinInput.value < formattedMinDate) {
+                         fechaFinInput.value = formattedMinDate;
+                    }
+                } else if (!esPlazoFijo) {
+                    fechaFinInput.setAttribute('disabled', 'disabled');
+                    fechaFinInput.value = '';
+                    fechaFinInput.removeAttribute('min');
+                }
+            }
+            tipoContratoSelect.addEventListener('change', actualizarMinimoFechaFin);
+            fechaInicioInput.addEventListener('change', actualizarMinimoFechaFin);
+            actualizarMinimoFechaFin();
+
+            // --- Lógica al Seleccionar Empleado ---
             tablaResultados.addEventListener('click', function(e) {
                 if (e.target && e.target.classList.contains('btnSeleccionarEmpleado')) {
                     const boton = e.target;
 
-                    // Obtiene los datos del botón
                     const codigo = boton.dataset.codigo;
                     const nombre = boton.dataset.nombre;
                     const cargo = boton.dataset.cargo;
                     const area = boton.dataset.area;
 
-                    // Rellena el formulario principal (Parte 3)
                     document.getElementById('ContratoEmpleadoCodigo').value = codigo;
                     document.getElementById('displayNombre').textContent = nombre;
                     document.getElementById('displayDNI').textContent = codigo;
                     document.getElementById('displayCargo').textContent = cargo;
                     document.getElementById('displayArea').textContent = area;
 
-                    // Muestra el formulario de contrato
                     panelDatosContrato.style.display = 'block';
-
-                    // Mueve la vista al formulario
                     panelDatosContrato.scrollIntoView({ behavior: 'smooth' });
                 }
             });
-
         });
     </script>
 }

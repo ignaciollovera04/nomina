@@ -14,7 +14,9 @@ namespace Aplicacion.Servicios
      
         Task<List<EmpleadoBusquedaDTO>> BuscarEmpleadosActivos(string query);
 
-        
+        Task<List<EmpleadoBusquedaDTO>> BuscarEmpleadosParaContrato();
+
+
         Task<ContratoFormDTO> ObtenerDatosParaFormularioContrato();
 
        
@@ -28,6 +30,8 @@ namespace Aplicacion.Servicios
 
     
         Task<ResultadoOperacionDTO> FinalizarContrato(string contratoCodigo, string motivo);
+
+        
     }
 
   
