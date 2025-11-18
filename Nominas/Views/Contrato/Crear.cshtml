@@ -1,0 +1,389 @@
+﻿@model Dominio.Entidades.Contrato
+@{
+    ViewData["Title"] = "Crear Nuevo Contrato";
+
+    // RN-02: Definimos la fecha de hoy para bloquear fechas pasadas
+    string fechaDeHoy = DateTime.Now.ToString("yyyy-MM-dd");
+
+
+    // EPS más populares
+    var listaEPS = new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Rímac EPS", Value = "Rímac EPS" },
+        new SelectListItem { Text = "Pacífico EPS", Value = "Pacífico EPS" },
+        new SelectListItem { Text = "Sanitas EPS", Value = "Sanitas EPS" },
+        new SelectListItem { Text = "La Positiva EPS", Value = "La Positiva EPS" },
+        new SelectListItem { Text = "Mapfre EPS", Value = "Mapfre EPS" },
+        new SelectListItem { Text = "Otro", Value = "Otro" }
+    };
+
+
+
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong><i class="bi bi-search"></i> 1. Buscar Empleado</strong>
+            </div>
+            <div class="card-body">
+
+                <form id="formBuscarEmpleado" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="inputBusqueda" class="form-label">Buscar por Código o Nombre</label>
+                        <input type="text" class="form-control" id="inputBusqueda" placeholder="Ingrese Código o Nombre...">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" id="btnBuscarEmpleado" class="btn btn-secondary w-100" disabled>
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+
+                    <div class="col-md-5">
+                        <button type="button" id="btnBuscarSinContrato" class="btn btn-outline-info w-100">
+                            <i class="bi bi-person-x"></i> Mostrar Empleados Inactivos / Expulsados
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong><i class="bi bi-list-ul"></i> 2. Lista de Empleados</strong>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Cargo Actual</th>
+                                <th>Área Actual</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultadosEmpleados">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Comience a escribir para buscar...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Crear" method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ContratoEmpleadoCodigo" id="ContratoEmpleadoCodigo" />
+    <div class="card shadow-sm" id="panelDatosContrato" style="display: none;">
+        <div class="card-header bg-primary text-white">
+            <strong><i class="bi bi-file-earmark-text-fill"></i> 3. Datos del Contrato</strong>
+        </div>
+        <div class="card-body">
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>Empleado Seleccionado:</h5>
+                    <p class="mb-0"><strong>Nombre:</strong> <span id="displayNombre" class="text-primary"></span></p>
+                    <p class="mb-0"><strong>DNI:</strong> <span id="displayDNI"></span></p>
+                    <p class="mb-0"><strong>Cargo Sugerido:</strong> <span id="displayCargo"></span></p>
+                    <p class="mb-0"><strong>Área Sugerida:</strong> <span id="displayArea"></span></p>
+                </div>
+            </div>
+            <hr />
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="ContratoTipoContrato" class="form-label">Tipo de Contrato</label>
+                    <select asp-for="ContratoTipoContrato" class="form-select" required>
+                        <option value="INDEFINIDO">Indefinido</option>
+                        <option value="PLAZO_FIJO">Plazo Fijo</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoFechaInicio" class="form-label">Fecha de Inicio</label>
+                    <input type="date" asp-for="ContratoFechaInicio"
+                           min="@fechaDeHoy"
+                           value="@fechaDeHoy"
+                           class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoFechaFin" class="form-label">Fecha de Fin (si es Plazo Fijo)</label>
+                    <input type="date" asp-for="ContratoFechaFin" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ContratoSueldo" class="form-label">Sueldo Básico (S/)</label>
+                    <input type="number" asp-for="ContratoSueldo" class="form-control" min="1130" step="0.01" placeholder="Ej: 1130.00" required />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoCargoCodigo" class="form-label">Cargo</label>
+                    <select asp-for="ContratoCargoCodigo" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Cargos" required>
+                        <option value="">-- Seleccionar Cargo --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoAreaCodigo" class="form-label">Área</label>
+                    <select asp-for="ContratoAreaCodigo" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Areas" required>
+                        <option value="">-- Seleccionar Área --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ContratoRegimenPensionario" class="form-label">Régimen Pensionario</label>
+                    <select asp-for="ContratoRegimenPensionario" class="form-select" required>
+                        <option value="ONP">ONP (Por defecto)</option>
+                        <option value="AFP INTEGRA">AFP INTEGRA</option>
+                        <option value="AFP PROFUTURO">AFP PROFUTURO</option>
+                        <option value="AFP HABITAT">AFP HABITAT</option>
+                        <option value="AFP PRIMA">AFP PRIMA</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoTipoSeguro" class="form-label">Cobertura de Salud</label>
+                    <select asp-for="ContratoTipoSeguro" class="form-select" required>
+                        <option value="ESSALUD">ESSALUD</option>
+                        <option value="EPS">EPS</option>
+                        <option value="SIS">SIS</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ContratoTipoSeguro" class="form-label">Cobertura de Salud</label>
+                    <select asp-for="ContratoEntidadEPS"
+                            id="ContratoEntidadEPS"
+                            class="form-select"
+                            asp-items="listaEPS"
+                            disabled>
+                        <option value="">-- Seleccionar EPS --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ContratoAsignacionFamiliar" class="form-label">Aplica Asignación Familiar</label>
+                    <select asp-for="ContratoAsignacionFamiliar" class="form-select" required>
+                        <option value="N">No</option>
+                        <option value="S">Sí (Aplica 10% RMV)</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+            <div class="text-end">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-save"></i> Guardar Contrato
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a asp-controller="Nomina" asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left-circle"></i> Volver al Dashboard Principal
+        </a>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // Función universal para retrasar la ejecución (Debouncing)
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const inputBusqueda = document.getElementById('inputBusqueda');
+            const tablaResultados = document.getElementById('tablaResultadosEmpleados');
+            const panelDatosContrato = document.getElementById('panelDatosContrato');
+            const btnBuscarSinContrato = document.getElementById('btnBuscarSinContrato');
+
+            const tipoContratoSelect = document.getElementById('ContratoTipoContrato');
+            const fechaInicioInput = document.getElementById('ContratoFechaInicio');
+            const fechaFinInput = document.getElementById('ContratoFechaFin');
+
+
+                    const tipoSeguroSelect = document.getElementById('ContratoTipoSeguro');
+        const entidadEPSSelect = document.getElementById('ContratoEntidadEPS');
+
+
+                function manejarHabilitacionEPS() {
+            const esEPS = tipoSeguroSelect.value === 'EPS';
+
+            if (esEPS) {
+                entidadEPSSelect.removeAttribute('disabled');
+                entidadEPSSelect.setAttribute('required', 'required');
+            } else {
+                entidadEPSSelect.setAttribute('disabled', 'disabled');
+                entidadEPSSelect.removeAttribute('required');
+                entidadEPSSelect.value = '';
+            }
+        }
+        
+        tipoSeguroSelect.addEventListener('change', manejarHabilitacionEPS);
+        manejarHabilitacionEPS();
+
+            // --- FUNCIÓN GENÉRICA PARA LLENAR LA TABLA ---
+            function llenarTablaResultados(data) {
+                tablaResultados.innerHTML = ''; // Limpia la tabla
+
+                if (data.length === 0) {
+                    tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No se encontraron empleados.</td></tr>';
+                    return;
+                }
+
+                data.forEach(empleado => {
+                    let botonHtml = '';
+                    let filaClass = '';
+                    let estadoBadge = '';
+
+                    // RN-06: Si está expulsado ('E'), deshabilitamos el botón
+                    if (empleado.estado === 'E') {
+                        filaClass = 'table-danger'; // Fila roja
+                        estadoBadge = '<span class="badge bg-danger">Expulsado</span>';
+                        botonHtml = `<button type="button" class="btn btn-secondary btn-sm" disabled title="Empleado expulsado, no se puede recontratar (RN-06)">
+                                        <i class="bi bi-slash-circle"></i> No Contratable
+                                     </button>`;
+                    } else { // 'I' (Inactivo) o 'A' (Activo de la búsqueda normal)
+                        if (empleado.estado === 'I') {
+                             estadoBadge = '<span class="badge bg-warning text-dark">Inactivo</span>';
+                        }
+
+                        botonHtml = `<button type="button" class="btn btn-primary btn-sm btnSeleccionarEmpleado"
+                                        data-codigo="${empleado.codigo}"
+                                        data-nombre="${empleado.nombre}"
+                                        data-cargo="${empleado.cargo || ''}"
+                                        data-area="${empleado.area || ''}">
+                                    <i class="bi bi-check-circle"></i> Seleccionar
+                                 </button>`;
+                    }
+
+                    tablaResultados.innerHTML += `
+                        <tr class="${filaClass}">
+                            <td>${empleado.codigo} ${estadoBadge}</td>
+                            <td>${empleado.nombre}</td>
+                            <td>${empleado.cargo || 'N/A'}</td>
+                            <td>${empleado.area || 'N/A'}</td>
+                            <td>${botonHtml}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+
+            // --- Lógica de Búsqueda de Empleado (AJAX - LIVE SEARCH) ---
+            function ejecutarBusqueda() {
+                const query = inputBusqueda.value;
+                if (query.length < 2) {
+                    tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Comience a escribir para buscar...</td></tr>';
+                    panelDatosContrato.style.display = 'none';
+                    return;
+                }
+
+                fetch(`@Url.Action("BuscarEmpleados", "Contrato")?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        llenarTablaResultados(data);
+                    })
+                    .catch(error => {
+                        console.error('Error en la búsqueda:', error);
+                        tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos.</td></tr>';
+                    });
+            }
+
+            inputBusqueda.addEventListener('input', debounce(ejecutarBusqueda, 300));
+
+            // --- Lógica del NUEVO Botón (Mostrar Inactivos/Expulsados) ---
+            btnBuscarSinContrato.addEventListener('click', function() {
+                tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Cargando...</td></tr>';
+
+                fetch(`@Url.Action("BuscarEmpleadosParaContrato", "Contrato")`)
+                    .then(response => response.json())
+                    .then(data => {
+                        llenarTablaResultados(data);
+                    })
+                    .catch(error => {
+                        console.error('Error en la búsqueda de inactivos:', error);
+                        tablaResultados.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos.</td></tr>';
+                    });
+            });
+
+            // --- Lógica de Validación de Fechas (30 Días) ---
+            function actualizarMinimoFechaFin() {
+                const inicioValue = fechaInicioInput.value;
+                const esPlazoFijo = tipoContratoSelect.value === 'PLAZO_FIJO';
+
+                if (esPlazoFijo && inicioValue) {
+                    const fechaInicio = new Date(inicioValue);
+                    const fechaMinFin = new Date(fechaInicio);
+                    fechaMinFin.setDate(fechaInicio.getDate() + 30);
+
+                    const year = fechaMinFin.getFullYear();
+                    const month = String(fechaMinFin.getMonth() + 1).padStart(2, '0');
+                    const day = String(fechaMinFin.getDate()).padStart(2, '0');
+                    const formattedMinDate = `${year}-${month}-${day}`;
+
+                    fechaFinInput.setAttribute('min', formattedMinDate);
+                    fechaFinInput.removeAttribute('disabled');
+
+                    if (!fechaFinInput.value || fechaFinInput.value < formattedMinDate) {
+                         fechaFinInput.value = formattedMinDate;
+                    }
+                } else if (!esPlazoFijo) {
+                    fechaFinInput.setAttribute('disabled', 'disabled');
+                    fechaFinInput.value = '';
+                    fechaFinInput.removeAttribute('min');
+                }
+            }
+            tipoContratoSelect.addEventListener('change', actualizarMinimoFechaFin);
+            fechaInicioInput.addEventListener('change', actualizarMinimoFechaFin);
+            actualizarMinimoFechaFin();
+
+            // --- Lógica al Seleccionar Empleado ---
+            tablaResultados.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('btnSeleccionarEmpleado')) {
+                    const boton = e.target;
+
+                    const codigo = boton.dataset.codigo;
+                    const nombre = boton.dataset.nombre;
+                    const cargo = boton.dataset.cargo;
+                    const area = boton.dataset.area;
+
+                    document.getElementById('ContratoEmpleadoCodigo').value = codigo;
+                    document.getElementById('displayNombre').textContent = nombre;
+                    document.getElementById('displayDNI').textContent = codigo;
+                    document.getElementById('displayCargo').textContent = cargo;
+                    document.getElementById('displayArea').textContent = area;
+
+                    panelDatosContrato.style.display = 'block';
+                    panelDatosContrato.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+}

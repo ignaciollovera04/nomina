@@ -1,0 +1,12 @@
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\bin\Debug\net8.0\Dominio.deps.json
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\bin\Debug\net8.0\Dominio.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\bin\Debug\net8.0\Dominio.pdb
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.AssemblyInfoInputs.cache
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.AssemblyInfo.cs
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.csproj.CoreCompileInputs.cache
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.sourcelink.json
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\refint\Dominio.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\Dominio.pdb
+C:\Proyectos\Sprint 4 CS\nominaV2\Dominio\obj\Debug\net8.0\ref\Dominio.dll

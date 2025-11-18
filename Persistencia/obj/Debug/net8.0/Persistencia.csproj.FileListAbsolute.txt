@@ -1,0 +1,16 @@
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\bin\Debug\net8.0\Persistencia.deps.json
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\bin\Debug\net8.0\Persistencia.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\bin\Debug\net8.0\Persistencia.pdb
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\bin\Debug\net8.0\Dominio.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\bin\Debug\net8.0\Dominio.pdb
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.csproj.AssemblyReference.cache
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.AssemblyInfoInputs.cache
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.AssemblyInfo.cs
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.csproj.CoreCompileInputs.cache
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.sourcelink.json
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persiste.7F7D6998.Up2Date
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\refint\Persistencia.dll
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\Persistencia.pdb
+C:\Proyectos\Sprint 4 CS\nominaV2\Persistencia\obj\Debug\net8.0\ref\Persistencia.dll

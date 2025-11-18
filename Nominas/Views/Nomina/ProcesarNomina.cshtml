@@ -1,0 +1,183 @@
+﻿@model List<Aplicacion.DTOs.PeriodoNominaDTO>
+@{
+    ViewData["Title"] = "Procesar Nómina por Periodo";
+    string periodoProcesado = ""; // Variable para guardar el código del período que se procesó
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>
+            <i class="bi bi-calculator-fill"></i> Procesar Nómina por Periodo
+        </h2>
+        <hr />
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    @if (TempData["Detalles"] != null)
+    {
+        // 1. Deserializa el DTO DETALLADO
+        var detalles = System.Text.Json.JsonSerializer.Deserialize<List<Aplicacion.DTOs.NominaDetalleDTO>>(TempData["Detalles"].ToString());
+
+        if (detalles != null && detalles.Any())
+        {
+            // 2. Obtiene el PeriodoCodigo del DTO (para el botón Anular)
+            periodoProcesado = detalles.First().PeriodoCodigo;
+        }
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-check"></i> Resumen de Nóminas Procesadas (@periodoProcesado)</h5>
+
+                <form asp-action="Anular" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="periodoCodigoAnular" value="@periodoProcesado" />
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Está seguro de anular la nómina para el período @periodoProcesado? Esta acción reabrirá el período.')">
+                        <i class="bi bi-trash"></i> Anular Procesamiento
+                    </button>
+                </form>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+
+                    <table class="table table-sm table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Cód. Nómina</th>
+                                <th>Cód. Contrato</th>
+                                <th>DNI</th>
+                                <th>Empleado</th>
+                                <th>Cargo</th>
+                                <th>S. Básico</th>
+                                <th>Asig. Familiar</th>
+                                <th>H. Extras (Cant)</th>
+                                <th>H. Extras (Monto)</th>
+                                <th>Gratificación</th>
+                                <th>CTS</th>
+                                <th>Total Ingresos</th>
+                                <th>ONP</th>
+                                <th>AFP</th>
+                                <th>Imp. 5ta</th>
+                                <th>Total Descuentos</th>
+                                <th>ESSALUD (9%)</th>
+                                <th class="text-end">Sueldo Neto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalle in detalles)
+                            {
+                                <tr>
+                                    <td><small>@detalle.NominaCodigo</small></td>
+                                    <td><small>@detalle.ContratoCodigo</small></td>
+                                    <td><small>@detalle.DNI</small></td>
+                                    <td>@detalle.EmpleadoNombre</td>
+                                    <td>@detalle.Cargo</td>
+                                    <td class="text-end">@detalle.SueldoBaseStr</td>
+                                    <td class="text-end">@detalle.AsignacionFamiliarStr</td>
+                                    <td class="text-end">@detalle.HorasExtrasCantStr</td>
+                                    <td class="text-end">@detalle.HorasExtrasMontoStr</td>
+                                    <td class="text-end text-success">@detalle.GratificacionStr</td>
+                                    <td class="text-end text-success">@detalle.CTSStr</td>
+                                    <td class="text-end"><strong>@detalle.SueldoBrutoStr</strong></td>
+                                    <td class="text-end text-danger">@detalle.DescuentoONPStr</td>
+                                    <td class="text-end text-danger">@detalle.DescuentoAFPStr</td>
+                                    <td class="text-end text-danger">@detalle.Renta5taStr</td>
+                                    <td class="text-end text-danger"><strong>@detalle.TotalDescuentosStr</strong></td>
+                                    <td class="text-end text-info">@detalle.AporteESSALUDStr</td>
+                                    <td class="text-end"><strong>S/ @detalle.SueldoNetoStr</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    @if (TempData["Errores"] != null)
+    {
+        var errores = System.Text.Json.JsonSerializer.Deserialize<List<string>>(TempData["Errores"].ToString());
+        <div class="alert alert-warning">
+            <h6><i class="bi bi-info-circle"></i> Detalles:</h6>
+            <ul class="mb-0">
+                @foreach (var error in errores)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-calendar-month"></i> Seleccionar Periodo</h4>
+
+                <form asp-action="GenerarPeriodos" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-light btn-sm"
+                            title="Generar 12 Períodos Futuros"
+                            onclick="return confirm('¿Está seguro de que desea generar 12 nuevos períodos para el próximo año?');">
+                        <i class="bi bi-calendar-plus"></i> Generar Períodos
+                    </button>
+                </form>
+            </div>
+            <div class="card-body">
+                @if (Model != null && Model.Any())
+                {
+                    <form asp-action="Procesar" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label for="periodoCodigo" class="form-label">Periodo de Nómina:</label>
+                            <select name="periodoCodigo" id="periodoCodigo" class="form-select form-select-lg" required>
+                                <option value="">-- Seleccione el próximo periodo a procesar --</option>
+                                @foreach (var periodo in Model)
+                                {
+                                    <option value="@periodo.PeriodoCodigo">
+                                        Del @periodo.PeriodoInicioStr al @periodo.PeriodoFinStr
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Importante:</strong> Al procesar, se calculará la nómina de todos los empleados activos. Esta acción cerrará el período.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-play-fill"></i> Procesar Nómina
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> No hay periodos 'Activos' disponibles para procesar.
+                        <p class="mb-0">Es posible que todos los períodos ya estén cerrados. Puede anular el último período procesado (si se muestra arriba) o generar nuevos períodos.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

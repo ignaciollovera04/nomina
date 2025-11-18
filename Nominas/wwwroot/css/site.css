@@ -1,0 +1,107 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+
+
+/* ================================================================= */
+/* ESTILOS PARA EL SIDEBAR (Barra Lateral Roja)             */
+/* ================================================================= */
+
+#wrapper {
+    display: flex;
+}
+
+#sidebar-wrapper {
+    /* Color rojo oscuro para el fondo */
+    min-height: 100vh;
+    width: 250px;
+    background-color: #A30000; /* Rojo principal */
+    color: #fff;
+    transition: margin 0.25s ease-out;
+    padding: 0;
+    position: fixed;
+    z-index: 1030; /* Asegura que esté por encima del contenido */
+}
+
+#page-content-wrapper {
+    /* Empuja el contenido principal para que empiece después del sidebar */
+    width: 100%;
+    padding-left: 250px; /* Igual al ancho del sidebar */
+}
+
+/* Estilos de los enlaces del sidebar */
+.sidebar-heading {
+    padding: 1.5rem 1.25rem;
+    font-size: 1.2rem;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.list-group-item {
+    background-color: transparent !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border: none;
+    padding: 1rem 1.25rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+    .list-group-item:hover {
+        background-color: #C00000 !important; 
+        color: #fff !important;
+        cursor: pointer;
+    }
+
+    .list-group-item i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 15px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#page-content-wrapper .list-group-item,
+#page-content-wrapper .list-group-item:hover {
+    color: #212529 !important; /* Fuerza el texto a ser negro */
+    background-color: #fff; /* Mantiene el fondo blanco (quita el hover) */
+}
+
+    /* Opcional: Estilo para los badges dentro de la lista (para que resalten) */
+    #page-content-wrapper .list-group-item .badge {
+        color: white !important;
+    }
+
+    /* Opcional: Estilo para el texto 'strong' (Total Neto Pagado) */
+    #page-content-wrapper .list-group-item strong {
+        color: #212529 !important;
+    }
+
+    #page-content-wrapper .list-group-item .text-success {
+        color: #198754 !important; /* Verde de Bootstrap */
+    }
